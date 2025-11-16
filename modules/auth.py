@@ -1,5 +1,6 @@
 """Authentication module for Waterloo Works"""
 
+import time
 import getpass
 from typing import Optional, Tuple
 from selenium import webdriver
@@ -21,7 +22,8 @@ class WaterlooWorksAuth:
         self,
         username: Optional[str] = None,
         password: Optional[str] = None,
-        driver: Optional[webdriver.Chrome] = None
+        driver: Optional[webdriver.Chrome] = None,
+        headless: bool = False
     ):
         """Initialize authentication
         
@@ -29,10 +31,12 @@ class WaterlooWorksAuth:
             username: Waterloo Works username (email)
             password: Waterloo Works password (will prompt if not provided)
             driver: Existing WebDriver instance (creates new one if not provided)
+            headless: Run browser in headless mode (default: False)
         """
         self.username = username
         self.password = password
         self.driver = driver
+        self.headless = headless
         self._owns_driver = driver is None
 
     def _create_driver(self) -> webdriver.Chrome:
@@ -44,10 +48,19 @@ class WaterlooWorksAuth:
         options = webdriver.ChromeOptions()
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
+        
+        if self.headless:
+            options.add_argument("--headless=new")
+            options.add_argument("--window-size=1920,1080")
+            print("✅ Browser opened (headless mode)")
+        else:
+            print("✅ Browser opened (visible mode)")
 
         driver = webdriver.Chrome(options=options)
-        driver.maximize_window()
-        print("✅ Browser opened")
+        
+        if not self.headless:
+            driver.maximize_window()
+        
         return driver
         
     def login(self) -> webdriver.Chrome:
@@ -84,16 +97,70 @@ class WaterlooWorksAuth:
             email_field.send_keys(self.username)
             self.driver.find_element(By.ID, "nextButton").click()
             
-            # Enter password
-            print("  → Entering password...")
-            password_field = WebDriverWait(self.driver, TIMEOUT_SHORT).until(
-                EC.presence_of_element_located((By.ID, "passwordInput"))
-            )
-            password_field.send_keys(self.password)
-            self.driver.find_element(By.ID, "submitButton").click()
+            # Enter password with retry on incorrect password
+            password_correct = False
+            max_password_attempts = 3
+            attempt = 0
+            
+            while not password_correct and attempt < max_password_attempts:
+                attempt += 1
+                
+                # Prompt for password if needed
+                if attempt > 1 or not self.password:
+                    if attempt > 1:
+                        print(f"  ❌ Incorrect password. Please try again (attempt {attempt}/{max_password_attempts})")
+                    self.password = getpass.getpass("Password: ")
+                
+                print(f"  → Entering password...")
+                password_field = WebDriverWait(self.driver, TIMEOUT_SHORT).until(
+                    EC.presence_of_element_located((By.ID, "passwordInput"))
+                )
+                password_field.clear()
+                password_field.send_keys(self.password)
+                self.driver.find_element(By.ID, "submitButton").click()
+                
+                # Wait a moment for the page to process
+                time.sleep(2)
+                
+                # Check if password is correct by looking for verification-code div
+                try:
+                    verification_div = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, "verification-code"))
+                    )
+                    password_correct = True
+                    
+                    # Display Duo verification code to user
+                    try:
+                        duo_code = verification_div.text.strip()
+                        if duo_code:
+                            print(f"\n🔐 Duo Verification Code: {duo_code}")
+                            print("   Please enter this code in your Duo Mobile app\n")
+                    except Exception:
+                        pass
+                    
+                except Exception:
+                    # verification-code div not found, check if we're back at email/password page
+                    try:
+                        # Check if we're back at the email input (password was wrong)
+                        email_input = self.driver.find_element(By.ID, "userNameInput")
+                        # We're back at email page, need to click next again
+                        self.driver.find_element(By.ID, "nextButton").click()
+                        password_correct = False
+                    except Exception:
+                        # Not at email page, might be at password page or somewhere else
+                        try:
+                            # Check if still at password page
+                            self.driver.find_element(By.ID, "passwordInput")
+                            password_correct = False
+                        except Exception:
+                            # Not sure where we are, assume password worked
+                            password_correct = True
+            
+            if not password_correct:
+                raise Exception(f"Failed to login after {max_password_attempts} password attempts")
             
             # Wait for Duo 2FA
-            print("\n⏳ Waiting for Duo 2FA (approve on your phone)...")
+            print("⏳ Waiting for Duo 2FA approval...")
             trust_button = WebDriverWait(self.driver, TIMEOUT_LONG).until(
                 EC.presence_of_element_located((By.ID, "trust-browser-button"))
             )
@@ -157,13 +224,15 @@ class WaterlooWorksAuth:
 
 def create_authenticated_session(
     username: Optional[str] = None,
-    password: Optional[str] = None
+    password: Optional[str] = None,
+    headless: bool = False
 ) -> Tuple[webdriver.Chrome, WaterlooWorksAuth]:
     """Create an authenticated Waterloo Works session
     
     Args:
         username: Waterloo Works username (will prompt if not provided)
         password: Waterloo Works password (will prompt if not provided)
+        headless: Run browser in headless mode (default: False)
         
     Returns:
         Tuple of (driver, auth) where driver is the authenticated WebDriver
@@ -176,6 +245,6 @@ def create_authenticated_session(
         finally:
             auth.close()
     """
-    auth = WaterlooWorksAuth(username, password)
+    auth = WaterlooWorksAuth(username, password, headless=headless)
     driver = auth.login()
     return driver, auth

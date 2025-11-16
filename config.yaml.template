@@ -30,6 +30,11 @@ waterloo_works:
   username: "your.email@uwaterloo.ca"
   password: ""  # Leave empty for security - will prompt when needed
 
+# Browser Configuration
+browser:
+  # Run browser in headless mode (true = hidden, false = visible)
+  headless: false
+
 # LLM Configuration
 llm:
   # Provider: openai | anthropic | gemini | groq

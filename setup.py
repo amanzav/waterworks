@@ -281,6 +281,12 @@ def setup_paths_and_defaults() -> tuple[dict, dict]:
     job_board_choice = input("  Default job board (1/2) [1]: ").strip() or "1"
     default_job_board = "direct" if job_board_choice == "2" else "full"
     
+    print("\n  Browser mode:")
+    print("    1. Visible (default) - See the browser window during scraping")
+    print("    2. Headless - Run browser hidden in background (faster)")
+    browser_choice = input("  Browser mode (1/2) [1]: ").strip() or "1"
+    headless = browser_choice == "2"
+    
     paths = {
         "cover_letters_dir": cover_letters_dir,
         "cache_dir": "~/.waterworks/cache"
@@ -291,7 +297,11 @@ def setup_paths_and_defaults() -> tuple[dict, dict]:
         "job_board": default_job_board
     }
     
-    return paths, defaults
+    browser = {
+        "headless": headless
+    }
+    
+    return paths, defaults, browser
 
 
 def save_config(config: dict, config_path: Path):
@@ -318,13 +328,14 @@ def main():
     profile = setup_profile()
     waterloo_works = setup_waterloo_works()
     llm = setup_llm()
-    paths, defaults = setup_paths_and_defaults()
+    paths, defaults, browser = setup_paths_and_defaults()
     
     # Build config
     config = {
         "profile": profile,
         "waterloo_works": waterloo_works,
         "llm": llm,
+        "browser": browser,
         "output": {
             "directory": paths["cover_letters_dir"],
             "format": "pdf",

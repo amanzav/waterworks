@@ -84,13 +84,14 @@ def generate(folder, job_board, force, dry_run):
         
         # Get credentials
         username, password = config.get_credentials()
+        headless = config.get_headless()
         
         # Authenticate and login
         print("\n" + "=" * 60)
         print("🔐 Authentication")
         print("=" * 60)
         
-        auth = WaterlooWorksAuth(username, password)
+        auth = WaterlooWorksAuth(username, password, headless=headless)
         driver = auth.login()
         
         try:

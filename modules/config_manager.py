@@ -238,3 +238,11 @@ class ConfigManager:
             Signature string or None if not set
         """
         return self.get("profile.signature", None)
+    
+    def get_headless(self) -> bool:
+        """Get browser headless mode setting
+        
+        Returns:
+            True if headless mode enabled, False otherwise
+        """
+        return self.get("browser.headless", False)
