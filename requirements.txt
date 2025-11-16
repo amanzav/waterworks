@@ -9,8 +9,8 @@ python-dotenv>=1.0.0
 # PDF parsing
 PyPDF2>=3.0.1
 
-# PDF conversion (cross-platform fallback)
-pypandoc>=1.11  # Optional: Falls back if LibreOffice not available
+# PDF conversion (cross-platform fallback) - optional
+# pypandoc>=1.11  # Commented out: Optional fallback if LibreOffice not available
 
 # LLM providers
 openai>=1.3.0

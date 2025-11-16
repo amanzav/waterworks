@@ -2,7 +2,10 @@
 
 Automate cover letter generation for Waterloo Works job applications using AI.
 
-**Requirements:** Python 3.9+ and Google Chrome
+**Requirements:** 
+- Python 3.9+
+- Google Chrome (must be installed and accessible)
+- ChromeDriver (automatically managed by Selenium)
 
 ## 🚀 Installation
 
@@ -137,6 +140,48 @@ modules/
 - Add type hints and docstrings
 - Handle exceptions specifically
 - Test on multiple platforms
+
+## 🤝 Contributing
+
+Contributions are welcome! To contribute:
+
+1. **Fork** the repository
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes** and test thoroughly
+4. **Commit**: `git commit -m 'Add amazing feature'`
+5. **Push**: `git push origin feature/amazing-feature`
+6. **Open a Pull Request**
+
+### Reporting Bugs
+
+Found a bug? [Open an issue](https://github.com/amanzav/waterworks/issues) with:
+- Clear description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- Your environment (OS, Python version)
+
+### Feature Requests
+
+Have an idea? [Open an issue](https://github.com/amanzav/waterworks/issues) and describe:
+- The feature you'd like
+- Why it would be useful
+- Possible implementation approach
+
+## 📜 Code of Conduct
+
+Be respectful and constructive in all interactions. This project follows standard open-source community guidelines:
+
+- **Be welcoming** to new contributors
+- **Be respectful** of differing viewpoints and experiences
+- **Accept constructive criticism** gracefully
+- **Focus on what's best** for the community
+- **Show empathy** towards other community members
+
+Harassment, trolling, or disrespectful behavior will not be tolerated.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 

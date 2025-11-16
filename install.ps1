@@ -8,9 +8,12 @@ Write-Host ""
 # Check if Python is installed
 try {
     $pythonVersion = python --version 2>&1
-    $versionMatch = $pythonVersion -match "Python (\d+)\.(\d+)"
-    $major = [int]$Matches[1]
-    $minor = [int]$Matches[2]
+    if ($pythonVersion -match "Python (\d+)\.(\d+)") {
+        $major = [int]$Matches[1]
+        $minor = [int]$Matches[2]
+    } else {
+        throw "Could not parse Python version"
+    }
     
     if ($major -lt 3 -or ($major -eq 3 -and $minor -lt 9)) {
         Write-Host "❌ Python $major.$minor found, but Python 3.9+ is required" -ForegroundColor Red

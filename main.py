@@ -9,6 +9,8 @@ Usage:
     python main.py config --show
 """
 
+__version__ = "1.0.0"
+
 import sys
 import click
 from pathlib import Path

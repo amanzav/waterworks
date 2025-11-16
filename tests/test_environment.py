@@ -76,7 +76,7 @@ def test_dependencies():
     print("\nOptional dependencies:")
     
     try:
-        import pypandoc
+        import pypandoc  # type: ignore
         print(f"✅ pypandoc (for PDF conversion fallback)")
     except ImportError:
         print(f"⚠️  pypandoc - not installed (optional)")
