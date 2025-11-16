@@ -1,4 +1,4 @@
-"""Interactive Setup Wizard for Geese CLI"""
+"""Interactive Setup Wizard for Waterworks CLI"""
 
 import os
 import sys
@@ -16,10 +16,10 @@ except ImportError:
 def print_header():
     """Print welcome header"""
     print("\n" + "=" * 60)
-    print("🦆 Geese - Cover Letter Generator Setup Wizard")
+    print("💧 Waterworks - Cover Letter Generator Setup Wizard")
     print("=" * 60)
-    print("\nThis wizard will help you set up Geese for the first time.")
-    print("You can always edit ~/.geese/config.yaml later.\n")
+    print("\nThis wizard will help you set up Waterworks for the first time.")
+    print("You can always edit ~/.waterworks/config.yaml later.\n")
 
 
 def prompt_with_default(prompt: str, default: str = "") -> str:
@@ -157,7 +157,7 @@ def setup_waterloo_works() -> dict:
         ""
     )
     
-    print("\n  For security, password will be prompted each time you run Geese.")
+    print("\n  For security, password will be prompted each time you run Waterworks.")
     print("  You can optionally save it in config.yaml (not recommended).")
     save_password = input("  Save password in config? (y/n) [n]: ").strip().lower()
     
@@ -230,7 +230,7 @@ def setup_llm() -> dict:
         print("  API key will be loaded from environment variable.")
     else:
         print(f"\n  Enter your {provider.capitalize()} API key.")
-        print("  (It will be saved securely in ~/.geese/config.yaml)")
+        print("  (It will be saved securely in ~/.waterworks/config.yaml)")
         api_key = getpass.getpass(f"\n  {provider.capitalize()} API Key: ").strip()
         
         if api_key:
@@ -264,7 +264,7 @@ def setup_paths_and_defaults() -> tuple[dict, dict]:
     
     default_folder = prompt_with_default(
         "Default Waterloo Works folder name",
-        "geese"
+        "waterworks"
     )
     
     print("\n  Job board options:")
@@ -275,7 +275,7 @@ def setup_paths_and_defaults() -> tuple[dict, dict]:
     
     paths = {
         "cover_letters_dir": cover_letters_dir,
-        "cache_dir": "~/.geese/cache"
+        "cache_dir": "~/.waterworks/cache"
     }
     
     defaults = {
@@ -327,7 +327,7 @@ def main():
     }
     
     # Save config
-    config_path = Path.home() / ".geese" / "config.yaml"
+    config_path = Path.home() / ".waterworks" / "config.yaml"
     
     print("\n" + "=" * 60)
     print("💾 Saving Configuration")
@@ -348,9 +348,9 @@ def main():
     print(f"\nConfiguration saved to: {config_path}")
     print("\nNext steps:")
     print("  1. Save jobs to a folder in Waterloo Works")
-    print("  2. Run: python geese.py generate --folder <folder_name>")
+    print("  2. Run: python waterworks.py generate --folder <folder_name>")
     print("  3. Review generated cover letters in:", paths["cover_letters_dir"])
-    print("\nFor help: python geese.py --help")
+    print("\nFor help: python waterworks.py --help")
     print()
 
 

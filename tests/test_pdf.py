@@ -177,7 +177,7 @@ def cleanup_test_files():
 
 
 if __name__ == "__main__":
-    print("\n🦆 Geese - PDF Generation Tests")
+    print("\n💧 Waterworks - PDF Generation Tests")
     print("="*60)
     
     # Run tests

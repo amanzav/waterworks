@@ -188,7 +188,7 @@ def test_job_extraction():
 
 
 if __name__ == "__main__":
-    print("\n🦆 Geese - Navigation & Extraction Tests")
+    print("\n💧 Waterworks - Navigation & Extraction Tests")
     print("="*60)
     
     # Run navigation test

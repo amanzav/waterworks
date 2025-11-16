@@ -159,7 +159,7 @@ def test_api_key_access():
 
 
 if __name__ == "__main__":
-    print("\n🦆 Geese - Configuration Tests")
+    print("\n💧 Waterworks - Configuration Tests")
     print("="*60)
     
     # Run tests

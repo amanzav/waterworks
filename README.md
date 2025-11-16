@@ -1,4 +1,4 @@
-# 🦆 Geese - CLI Cover Letter Generator
+# 💧 Waterworks - CLI Cover Letter Generator
 
 Automate cover letter generation for Waterloo Works job applications using AI.
 
@@ -28,8 +28,8 @@ Automate cover letter generation for Waterloo Works job applications using AI.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/amanzav/geese.git
-cd geese/v2
+git clone https://github.com/amanzav/waterworks.git
+cd waterworks
 ```
 
 ### 2. Install Dependencies
@@ -55,17 +55,17 @@ The setup wizard will guide you through:
 - Choosing an LLM provider and model
 - Configuring output directories
 
-This creates a config file at `~/.geese/config.yaml`
+This creates a config file at `~/.waterworks/config.yaml`
 
 ### 4. Save Jobs on Waterloo Works
 
 1. Log into [Waterloo Works](https://waterlooworks.uwaterloo.ca)
-2. Browse jobs and save desired positions to a folder (e.g., "geese")
+2. Browse jobs and save desired positions to a folder (e.g., "waterworks")
 
 ### 5. Generate Cover Letters
 
 ```bash
-python geese.py generate --folder geese
+python waterworks.py generate --folder waterworks
 ```
 
 This will:
@@ -80,40 +80,43 @@ This will:
 
 ```bash
 # Generate for default folder (from config)
-python geese.py generate
+python waterworks.py generate
 
 # Generate for specific folder
-python geese.py generate --folder my_jobs
+python waterworks.py generate --folder my_jobs
+
+# Generate from Employer-Student Direct job board
+python waterworks.py generate --folder my_jobs --job-board direct
 
 # Force regenerate all (even if they exist)
-python geese.py generate --folder my_jobs --force
+python waterworks.py generate --folder my_jobs --force
 
 # Preview what would be generated
-python geese.py generate --folder my_jobs --dry-run
+python waterworks.py generate --folder my_jobs --dry-run
 ```
 
 ### Manage Configuration
 
 ```bash
 # Show current configuration
-python geese.py config --show
+python waterworks.py config --show
 
 # Update a config value
-python geese.py config --set llm.model gpt-4o
-python geese.py config --set defaults.folder_name my_folder
+python waterworks.py config --set llm.model gpt-4o
+python waterworks.py config --set defaults.folder_name my_folder
 ```
 
 ### Get Help
 
 ```bash
-python geese.py --help
-python geese.py generate --help
-python geese.py config --help
+python waterworks.py --help
+python waterworks.py generate --help
+python waterworks.py config --help
 ```
 
 ## ⚙️ Configuration
 
-Your configuration is stored at `~/.geese/config.yaml`. You can edit it directly or use the `config` command.
+Your configuration is stored at `~/.waterworks/config.yaml`. You can edit it directly or use the `config` command.
 
 ### Key Configuration Options
 
@@ -136,7 +139,8 @@ paths:
   cover_letters_dir: "./cover_letters"
 
 defaults:
-  folder_name: "geese"
+  folder_name: "waterworks"
+  job_board: "full"  # full | direct
 ```
 
 ### LLM Provider Options
@@ -221,23 +225,37 @@ If PDF extraction fails during setup, manually add your resume text to `~/.geese
 ## 📁 Project Structure
 
 ```
-v2/
-├── geese.py                    # Main CLI entry point
+waterworks/
+├── waterworks.py               # Main CLI entry point
 ├── setup.py                    # Interactive setup wizard
 ├── requirements.txt            # Python dependencies
 ├── config.yaml.template        # Configuration template
 ├── README.md                   # This file
-├── PRD.md                      # Product requirements
 │
-└── modules/
+├── cover_letters/              # Generated cover letters (PDFs)
+│
+├── docs/
+│   └── PRD.md                  # Product requirements
+│
+├── modules/
+│   ├── __init__.py
+│   ├── auth.py                 # Waterloo Works authentication
+│   ├── config_manager.py       # Configuration handling
+│   ├── cover_letter_generator.py  # LLM-based generation
+│   ├── folder_navigator.py     # Folder navigation & job extraction
+│   ├── job_extractor.py        # Job detail scraping
+│   ├── pdf_builder.py          # PDF creation
+│   └── utils.py                # Selenium utilities
+│
+└── tests/
     ├── __init__.py
-    ├── auth.py                 # Waterloo Works authentication
-    ├── config_manager.py       # Configuration handling
-    ├── cover_letter_generator.py  # LLM-based generation
-    ├── folder_navigator.py     # Folder navigation & job extraction
-    ├── job_extractor.py        # Job detail scraping
-    ├── pdf_builder.py          # PDF creation
-    └── utils.py                # Selenium utilities
+    ├── README.md               # Testing documentation
+    ├── run_all_tests.py        # Run complete test suite
+    ├── test_auth.py            # Authentication tests
+    ├── test_config.py          # Configuration tests
+    ├── test_llm.py             # LLM provider tests
+    ├── test_navigation.py      # Navigation & extraction tests
+    └── test_pdf.py             # PDF generation tests
 ```
 
 ## 🤝 Contributing
@@ -259,4 +277,4 @@ This tool is for personal use only. Always review generated cover letters before
 
 ---
 
-**Good luck with your job search! 🦆✨**
+**Good luck with your job search! 💧✨**

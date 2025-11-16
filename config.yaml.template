@@ -1,5 +1,5 @@
-# Geese Configuration File
-# Copy this file to ~/.geese/config.yaml and fill in your details
+# Waterworks Configuration File
+# Copy this file to ~/.waterworks/config.yaml and fill in your details
 
 # User Profile
 profile:
@@ -61,9 +61,14 @@ paths:
   cover_letters_dir: "./cover_letters"
   
   # Cache directory for resume text and other data
-  cache_dir: "~/.geese/cache"
+  cache_dir: "~/.waterworks/cache"
 
 # Defaults
 defaults:
   # Default Waterloo Works folder name to use if not specified
-  folder_name: "geese"
+  folder_name: "waterworks"
+  
+  # Default job board: full | direct
+  # full = Full-Cycle Service (aligned with work terms)
+  # direct = Employer-Student Direct (apply outside hiring cycles)
+  job_board: "full"

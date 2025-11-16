@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Geese - CLI Cover Letter Generator for Waterloo Works
+Waterworks - CLI Cover Letter Generator for Waterloo Works
 
 Usage:
-    python geese.py generate --folder <folder_name>
-    python geese.py generate --folder <folder_name> --force
-    python geese.py generate --dry-run
-    python geese.py config --show
+    python waterworks.py generate --folder <folder_name>
+    python waterworks.py generate --folder <folder_name> --force
+    python waterworks.py generate --dry-run
+    python waterworks.py config --show
 """
 
 import sys
@@ -22,7 +22,7 @@ from modules.cover_letter_generator import CoverLetterGenerator, CoverLetterMana
 
 @click.group()
 def cli():
-    """🦆 Geese - CLI Cover Letter Generator for Waterloo Works"""
+    """💧 Waterworks - CLI Cover Letter Generator for Waterloo Works"""
     pass
 
 
@@ -248,7 +248,7 @@ def generate(folder, job_board, force, dry_run):
     help="Set a configuration value (e.g., --set llm.model gpt-4o)"
 )
 def config(show, set):
-    """Manage Geese configuration"""
+    """Manage Waterworks configuration"""
     
     try:
         config_mgr = ConfigManager()
@@ -311,8 +311,8 @@ def config(show, set):
             print("\n📋 Configuration Management")
             print("=" * 60)
             print("Usage:")
-            print("  python geese.py config --show              # Show current config")
-            print("  python geese.py config --set KEY VALUE     # Set a config value")
+            print("  python waterworks.py config --show              # Show current config")
+            print("  python waterworks.py config --set KEY VALUE     # Set a config value")
             print()
             print(f"Config file location: {config_mgr.config_path}")
             print()

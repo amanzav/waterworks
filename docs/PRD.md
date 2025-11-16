@@ -1,5 +1,5 @@
 # Product Requirements Document (PRD)
-## Geese - CLI Cover Letter Generator
+## Waterworks - CLI Cover Letter Generator
 
 **Version:** 1.0  
 **Date:** November 16, 2025  
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-Geese is a streamlined command-line tool that automates cover letter generation for Waterloo Works job applications. It focuses on delivering a single, polished feature: generating personalized cover letters from saved job folders using AI.
+Waterworks is a streamlined command-line tool that automates cover letter generation for Waterloo Works job applications. It focuses on delivering a single, polished feature: generating personalized cover letters from saved job folders using AI.
 
 **Key Features:**
 - CLI-only (no web frontend)
@@ -26,7 +26,7 @@ Students applying to co-op jobs through Waterloo Works face two key challenges:
 1. **Volume**: Applying to 50-100+ jobs requires unique cover letters for each
 2. **Quality**: Generic cover letters hurt application success rates
 
-Geese focuses exclusively on the cover letter generation workflow, keeping the tool simple and effective.
+Waterworks focuses exclusively on the cover letter generation workflow, keeping the tool simple and effective.
 
 ---
 
@@ -50,8 +50,8 @@ Geese focuses exclusively on the cover letter generation workflow, keeping the t
 ### Core Flow
 1. **Setup** (one-time):
    ```bash
-   git clone https://github.com/amanzav/geese.git
-   cd geese
+   git clone https://github.com/amanzav/waterworks.git
+   cd waterworks
    python setup.py  # Interactive setup wizard
    ```
    - Setup wizard collects:
@@ -63,11 +63,11 @@ Geese focuses exclusively on the cover letter generation workflow, keeping the t
      - Output folder for cover letters
 
 2. **Save Jobs** (on Waterloo Works):
-   - User browses Waterloo Works and saves desired jobs to a folder (e.g., "geese_jobs")
+   - User browses Waterloo Works and saves desired jobs to a folder (e.g., "waterworks_jobs")
 
 3. **Generate Cover Letters**:
    ```bash
-   python geese.py generate --folder "geese_jobs"
+   python waterworks.py generate --folder "waterworks_jobs"
    ```
    - Script logs into Waterloo Works (with Duo Mobile 2FA prompt)
    - Navigates to specified folder
@@ -98,7 +98,7 @@ Geese focuses exclusively on the cover letter generation workflow, keeping the t
   - `click` - CLI framework
 
 ### Configuration File Structure
-**~/.geese/config.yaml**:
+**~/.waterworks/config.yaml**:
 ```yaml
 # User Profile
 profile:
@@ -129,20 +129,21 @@ llm:
 # Paths
 paths:
   cover_letters_dir: "./cover_letters"
-  cache_dir: "~/.geese/cache"
+  cache_dir: "~/.waterworks/cache"
 
 # Defaults
 defaults:
-  folder_name: "geese"  # Default Waterloo Works folder to use
+  folder_name: "waterworks"  # Default Waterloo Works folder to use
+  job_board: "full"  # full | direct
 ```
 
 ### Code Structure
 ```
-geese/
+waterworks/
 ├── PRD.md                          # This document
 ├── README.md                       # User-facing documentation
 ├── setup.py                        # Interactive setup wizard
-├── geese.py                        # Main CLI entry point
+├── waterworks.py                   # Main CLI entry point
 ├── config.yaml.template            # Template config file
 ├── requirements.txt                # Python dependencies
 │
@@ -201,7 +202,7 @@ geese/
 
 **Acceptance Criteria**:
 - Setup wizard prompts for all required information
-- Creates `~/.geese/config.yaml` with user inputs
+- Creates `~/.waterworks/config.yaml` with user inputs
 - Extracts text from resume PDF and caches it
 - Validates API key works with chosen LLM provider
 - Handles missing or invalid inputs gracefully
@@ -214,7 +215,7 @@ geese/
 - **So that** I can save hours of manual writing
 
 **Acceptance Criteria**:
-- Command: `python geese.py generate --folder "folder_name"`
+- Command: `python waterworks.py generate --folder "folder_name"`
 - Logs into Waterloo Works with Duo 2FA
 - Navigates to specified folder
 - Extracts all jobs across all pages
@@ -274,7 +275,7 @@ geese/
 - Falls back to defaults if model unavailable
 
 **US-7: Dry Run Mode**
-- `python geese.py generate --folder "jobs" --dry-run`
+- `python waterworks.py generate --folder "jobs" --dry-run`
 - Shows what would be generated without actually generating
 - Useful for checking job count before API costs
 
@@ -420,22 +421,25 @@ These may be considered for future versions.
 python setup.py
 
 # Generate cover letters (default folder from config)
-python geese.py generate
+python waterworks.py generate
 
 # Generate from specific folder
-python geese.py generate --folder "urgent_jobs"
+python waterworks.py generate --folder "urgent_jobs"
+
+# Generate from Employer-Student Direct job board
+python waterworks.py generate --folder "jobs" --job-board direct
 
 # Force regenerate all (ignore existing)
-python geese.py generate --force
+python waterworks.py generate --force
 
 # Dry run (preview without generating)
-python geese.py generate --dry-run
+python waterworks.py generate --dry-run
 
 # Update configuration
-python geese.py config --set llm.model="gpt-4o"
+python waterworks.py config --set llm.model="gpt-4o"
 
 # Show current configuration
-python geese.py config --show
+python waterworks.py config --show
 ```
 
 ### B. Example Output
@@ -448,8 +452,8 @@ python geese.py config --show
 ⏳ Waiting for Duo 2FA (approve on your phone)...
 ✅ Login successful!
 
-📁 Navigating to 'geese_jobs' folder...
-   ✓ Successfully navigated to 'geese_jobs' folder
+📁 Navigating to 'waterworks_jobs' folder...
+   ✓ Successfully navigated to 'waterworks_jobs' folder
 
 📄 Found 2 page(s) of jobs
 
@@ -508,7 +512,8 @@ paths:
   cover_letters_dir: "./cover_letters"
 
 defaults:
-  folder_name: "geese"
+  folder_name: "waterworks"  # Default Waterloo Works folder to use
+  job_board: "full"
 ```
 
 ---

@@ -1,4 +1,4 @@
-"""Run all tests for Geese CLI"""
+"""Run all tests for Waterworks CLI"""
 
 import sys
 import subprocess

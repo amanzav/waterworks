@@ -117,7 +117,7 @@ def test_login_with_context_manager():
 
 
 if __name__ == "__main__":
-    print("\n🦆 Geese - Authentication Tests")
+    print("\n💧 Waterworks - Authentication Tests")
     print("="*60)
     
     # Run basic login test

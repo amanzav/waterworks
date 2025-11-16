@@ -1,1 +1,1 @@
-"""Test suite for Geese CLI"""
+"""Test suite for Waterworks CLI"""

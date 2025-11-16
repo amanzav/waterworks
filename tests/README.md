@@ -1,6 +1,6 @@
-# Geese CLI - Test Suite
+# Waterworks CLI - Test Suite
 
-This directory contains automated tests for the Geese CLI tool to help diagnose issues and verify functionality.
+This directory contains automated tests for the Waterworks CLI tool to help diagnose issues and verify functionality.
 
 ## 🧪 Test Files
 
@@ -17,7 +17,7 @@ Tests the configuration management system:
 python tests/test_config.py
 ```
 
-**Requirements:** Config file at `~/.geese/config.yaml`
+**Requirements:** Config file at `~/.waterworks/config.yaml`
 
 ---
 
@@ -161,7 +161,7 @@ python setup.py
 
 **Check:**
 ```bash
-python geese.py config --show
+python waterworks.py config --show
 ```
 
 ### LLM Tests Fail
@@ -173,7 +173,7 @@ python geese.py config --show
 
 **Check:**
 ```bash
-python geese.py config --show
+python waterworks.py config --show
 ```
 
 ### Navigation Tests Fail

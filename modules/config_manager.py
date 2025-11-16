@@ -1,4 +1,4 @@
-"""Configuration Manager for Geese CLI"""
+"""Configuration Manager for Waterworks CLI"""
 
 import os
 import yaml
@@ -7,15 +7,15 @@ from typing import Dict, Any, Optional
 
 
 class ConfigManager:
-    """Handle loading, validation, and access to Geese configuration"""
+    """Handle loading, validation, and access to Waterworks configuration"""
     
-    DEFAULT_CONFIG_PATH = Path.home() / ".geese" / "config.yaml"
+    DEFAULT_CONFIG_PATH = Path.home() / ".waterworks" / "config.yaml"
     
     def __init__(self, config_path: Optional[Path] = None):
         """Initialize config manager
         
         Args:
-            config_path: Path to config file (defaults to ~/.geese/config.yaml)
+            config_path: Path to config file (defaults to ~/.waterworks/config.yaml)
         """
         self.config_path = config_path or self.DEFAULT_CONFIG_PATH
         self.config: Dict[str, Any] = {}
@@ -221,7 +221,7 @@ class ConfigManager:
         Returns:
             Default folder name
         """
-        return self.get("defaults.folder_name", "geese")
+        return self.get("defaults.folder_name", "waterworks")
     
     def get_default_job_board(self) -> str:
         """Get default job board type from config
