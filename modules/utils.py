@@ -1,4 +1,4 @@
-"""Utility functions and constants for Geese"""
+"""Utility functions and constants for Waterworks"""
 
 import re
 import time

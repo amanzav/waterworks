@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
 from .utils import WaitTimes, SELECTORS
 
 
@@ -110,8 +111,16 @@ class JobExtractor:
                 **sections  # Include all individual sections
             }
             
-        except Exception as e:
+        except TimeoutException as e:
+            print(f"   ✗ Timeout extracting details for job {job_id}: Panel did not load")
+            self._close_panel()
+            return None
+        except (NoSuchElementException, WebDriverException) as e:
             print(f"   ✗ Error extracting details for job {job_id}: {e}")
+            self._close_panel()
+            return None
+        except Exception as e:
+            print(f"   ✗ Unexpected error extracting details for job {job_id}: {e}")
             # Try to close panel even on error
             self._close_panel()
             return None

@@ -128,12 +128,12 @@ profile:
 
 waterloo_works:
   username: "your.email@uwaterloo.ca"
-  password: ""  # Leave empty for security
+  password: ""  # LEAVE EMPTY - will prompt securely at runtime
 
 llm:
   provider: "openai"  # openai | anthropic | gemini | groq
   model: "gpt-4o-mini"
-  api_key: ""  # Or set environment variable
+  api_key: ""  # Or set environment variable (RECOMMENDED)
 
 paths:
   cover_letters_dir: "./cover_letters"
@@ -142,6 +142,8 @@ defaults:
   folder_name: "waterworks"
   job_board: "full"  # full | direct
 ```
+
+**⚠️ Security Warning**: Never commit your `config.yaml` to Git if it contains passwords or API keys. The `.gitignore` file is configured to exclude it, but always verify before committing.
 
 ### LLM Provider Options
 

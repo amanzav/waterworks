@@ -14,6 +14,9 @@ TIMEOUT_SHORT = 10
 TIMEOUT_MEDIUM = 30
 TIMEOUT_LONG = 60
 
+# Retry constants
+MAX_PASSWORD_ATTEMPTS = 3
+
 
 class WaterlooWorksAuth:
     """Handle authentication for Waterloo Works"""
@@ -99,16 +102,18 @@ class WaterlooWorksAuth:
             
             # Enter password with retry on incorrect password
             password_correct = False
-            max_password_attempts = 3
+            max_password_attempts = MAX_PASSWORD_ATTEMPTS
             attempt = 0
+            original_password = self.password  # Store original to allow retry
             
             while not password_correct and attempt < max_password_attempts:
                 attempt += 1
                 
                 # Prompt for password if needed
-                if attempt > 1 or not self.password:
-                    if attempt > 1:
-                        print(f"  ❌ Incorrect password. Please try again (attempt {attempt}/{max_password_attempts})")
+                if attempt > 1:
+                    print(f"  ❌ Incorrect password. Please try again (attempt {attempt}/{max_password_attempts})")
+                    self.password = getpass.getpass("Password: ")
+                elif not self.password:
                     self.password = getpass.getpass("Password: ")
                 
                 print(f"  → Entering password...")

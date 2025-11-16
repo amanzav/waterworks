@@ -68,6 +68,13 @@ def generate(folder, job_board, force, dry_run):
             print(f"\nEdit your config at: {config.config_path}")
             sys.exit(1)
         
+        # Additional validation: Check resume file exists
+        resume_path = Path(config.get("profile.resume_pdf", ""))
+        if not resume_path.exists():
+            print(f"\n❌ Resume file not found: {resume_path}")
+            print("Please update the path in your config file.")
+            sys.exit(1)
+        
         print("✅ Configuration loaded\n")
         
         # Get folder name
@@ -222,10 +229,11 @@ def generate(folder, job_board, force, dry_run):
             
         finally:
             # Close browser - ensure cleanup happens even if there are errors
-            try:
-                auth.close()
-            except Exception as e:
-                print(f"⚠️  Warning: Error during cleanup: {e}")
+            if 'auth' in locals():
+                try:
+                    auth.close()
+                except Exception as e:
+                    print(f"⚠️  Warning: Error during cleanup: {e}")
         
     except FileNotFoundError as e:
         print(f"\n❌ {e}")

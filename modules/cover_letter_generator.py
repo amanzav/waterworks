@@ -1,8 +1,14 @@
 """Cover letter generation module with multi-LLM support"""
 
 import os
+import time
 from typing import Optional
 from pathlib import Path
+
+# Constants
+MAX_RETRIES = 3
+RETRY_DELAY = 2  # seconds between retries
+RATE_LIMIT_DELAY = 0.5  # seconds between API calls to avoid rate limiting
 
 
 class CoverLetterGenerator:
@@ -30,6 +36,10 @@ class CoverLetterGenerator:
         self.api_key = api_key
         self.resume_text = resume_text
         self.additional_info = additional_info or ""
+        
+        # Validate API key
+        if not self.api_key:
+            raise ValueError(f"API key required for provider '{self.provider}'")
         
         # Initialize the appropriate client
         self._client = self._initialize_client()
@@ -61,7 +71,7 @@ class CoverLetterGenerator:
         company: str,
         job_title: str,
         job_description: str,
-        max_retries: int = 3
+        max_retries: int = MAX_RETRIES
     ) -> Optional[str]:
         """Generate a cover letter for a job
         
@@ -90,7 +100,8 @@ class CoverLetterGenerator:
                     return self._generate_groq(prompt)
             except Exception as e:
                 if attempt < max_retries - 1:
-                    print(f"      ⚠️  Attempt {attempt + 1} failed: {e}. Retrying...")
+                    print(f"      ⚠️  Attempt {attempt + 1} failed: {e}. Retrying in {RETRY_DELAY}s...")
+                    time.sleep(RETRY_DELAY)
                 else:
                     print(f"      ✗ All {max_retries} attempts failed: {e}")
                     return None
@@ -277,6 +288,9 @@ class CoverLetterManager:
         
         word_count = len(cover_text.split())
         print(f"      ✓ Generated {word_count} word cover letter")
+        
+        # Small delay to avoid rate limiting
+        time.sleep(RATE_LIMIT_DELAY)
         
         # Save as PDF
         from .pdf_builder import PDFBuilder

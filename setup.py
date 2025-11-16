@@ -160,10 +160,18 @@ def setup_waterloo_works() -> dict:
     print("\n🔑 STEP 2: Waterloo Works Credentials")
     print("-" * 60)
     
-    username = prompt_with_default(
-        "Waterloo Works username (email)",
-        ""
-    )
+    # Get and validate username (email)
+    while True:
+        username = prompt_with_default(
+            "Waterloo Works username (email)",
+            ""
+        )
+        
+        # Basic email validation
+        if "@" in username and "." in username:
+            break
+        else:
+            print("  ⚠️  Please enter a valid email address")
     
     print("\n  For security, password will be prompted each time you run Waterworks.")
     print("  You can optionally save it in config.yaml (not recommended).")

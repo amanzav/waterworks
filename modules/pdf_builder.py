@@ -6,41 +6,7 @@ from typing import Optional
 from docx import Document
 from docx.shared import Pt
 import pythoncom
-
-
-def sanitize_filename(text: str) -> str:
-    """Sanitize text for use as filename
-    
-    Args:
-        text: Text to sanitize
-        
-    Returns:
-        Sanitized filename-safe string
-    """
-    # Replace special characters
-    text = text.replace('/', '_')
-    text = text.replace('\\', '_')
-    text = text.replace(':', '_')
-    text = text.replace('*', '_')
-    text = text.replace('?', '_')
-    text = text.replace('"', '')
-    text = text.replace('<', '')
-    text = text.replace('>', '')
-    text = text.replace('|', '_')
-    text = text.replace('(', '')
-    text = text.replace(')', '')
-    text = text.replace('[', '')
-    text = text.replace(']', '')
-    text = text.replace('{', '')
-    text = text.replace('}', '')
-    
-    # Remove non-word characters
-    text = re.sub(r'[^\w\s-]', '', text)
-    text = re.sub(r'\s+', ' ', text)
-    text = text.strip().replace(' ', '_')
-    text = re.sub(r'_+', '_', text)
-    
-    return text.strip('_')
+from .utils import sanitize_filename
 
 
 def get_document_name(company: str, job_title: str) -> str:
@@ -100,7 +66,9 @@ class PDFBuilder:
                 document = Document()
             
             # Add cover letter text
-            full_text = f"{cover_text}\n\n{signature}"
+            # Use default signature if none provided
+            signature_text = signature if signature else "Sincerely"
+            full_text = f"{cover_text}\n\n{signature_text}"
             
             paragraph = document.add_paragraph()
             run = paragraph.add_run(full_text)
@@ -138,9 +106,9 @@ class PDFBuilder:
         if platform.system() != "Windows":
             print(f"      ⚠️  PDF conversion only supported on Windows")
             print(f"      ℹ️  DOCX file saved at: {docx_path}")
-            print(f"      💡 Tip: Use LibreOffice or similar to convert manually:")
+            print(f"      💡 Tip: Use LibreOffice to convert manually:")
             print(f"          libreoffice --headless --convert-to pdf '{docx_path}'")
-            return False
+            return True  # DOCX was created successfully, manual conversion needed
         
         try:
             # Initialize COM for Windows
