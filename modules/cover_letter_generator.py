@@ -2,7 +2,7 @@
 
 import os
 import time
-from typing import Optional
+from typing import Optional, Dict
 from pathlib import Path
 
 # Constants
@@ -20,7 +20,9 @@ class CoverLetterGenerator:
         model: str,
         api_key: str,
         resume_text: str,
-        additional_info: Optional[str] = None
+        user_profile: Optional[Dict[str, str]] = None,
+        additional_info: Optional[str] = None,
+        prompt_template: Optional[str] = None
     ):
         """Initialize cover letter generator
         
@@ -29,13 +31,17 @@ class CoverLetterGenerator:
             model: Model name
             api_key: API key for the provider
             resume_text: User's resume text
+            user_profile: User profile dict with name, email, phone, etc.
             additional_info: Additional information to include
+            prompt_template: Custom prompt template (uses default if None)
         """
         self.provider = provider.lower()
         self.model = model
         self.api_key = api_key
         self.resume_text = resume_text
+        self.user_profile = user_profile or {}
         self.additional_info = additional_info or ""
+        self.prompt_template = prompt_template
         
         # Validate API key
         if not self.api_key:
@@ -91,13 +97,19 @@ class CoverLetterGenerator:
         for attempt in range(max_retries):
             try:
                 if self.provider == "openai":
-                    return self._generate_openai(prompt)
+                    body_text = self._generate_openai(prompt)
                 elif self.provider == "anthropic":
-                    return self._generate_anthropic(prompt)
+                    body_text = self._generate_anthropic(prompt)
                 elif self.provider == "gemini":
-                    return self._generate_gemini(prompt)
+                    body_text = self._generate_gemini(prompt)
                 elif self.provider == "groq":
-                    return self._generate_groq(prompt)
+                    body_text = self._generate_groq(prompt)
+                else:
+                    return None
+                
+                # Add header if profile info available
+                return self._add_header(body_text)
+                
             except Exception as e:
                 if attempt < max_retries - 1:
                     print(f"      ⚠️  Attempt {attempt + 1} failed: {e}. Retrying in {RETRY_DELAY}s...")
@@ -107,6 +119,52 @@ class CoverLetterGenerator:
                     return None
         
         return None
+    
+    def _add_header(self, body_text: str) -> str:
+        """Add contact header to cover letter if profile info available
+        
+        Args:
+            body_text: Generated cover letter body
+            
+        Returns:
+            Full text with header prepended
+        """
+        if not self.user_profile:
+            return body_text
+        
+        # Build header lines
+        header_lines = []
+        
+        # Name
+        if self.user_profile.get("name"):
+            header_lines.append(self.user_profile["name"])
+        
+        # Contact line: email | phone
+        contact_parts = []
+        if self.user_profile.get("email"):
+            contact_parts.append(self.user_profile["email"])
+        if self.user_profile.get("phone"):
+            contact_parts.append(self.user_profile["phone"])
+        if contact_parts:
+            header_lines.append(" | ".join(contact_parts))
+        
+        # Links line: LinkedIn | GitHub | Website
+        links_parts = []
+        if self.user_profile.get("linkedin"):
+            links_parts.append(self.user_profile["linkedin"])
+        if self.user_profile.get("github"):
+            links_parts.append(self.user_profile["github"])
+        if self.user_profile.get("website"):
+            links_parts.append(self.user_profile["website"])
+        if links_parts:
+            header_lines.append(" | ".join(links_parts))
+        
+        # Combine header and body
+        if header_lines:
+            header = "\n".join(header_lines)
+            return f"{header}\n\n{body_text}"
+        
+        return body_text
     
     def _build_prompt(self, company: str, job_title: str, job_description: str) -> str:
         """Build the prompt for cover letter generation
@@ -121,7 +179,17 @@ class CoverLetterGenerator:
         """
         profile_info = f"{self.resume_text}\n\n{self.additional_info}".strip()
         
-        prompt = f"""You are an expert cover letter writer. Write a professional, enthusiastic cover letter for the following job application.
+        # Use custom template if provided, otherwise use default
+        if self.prompt_template:
+            prompt = self.prompt_template.format(
+                company=company,
+                job_title=job_title,
+                job_description=job_description,
+                profile_info=profile_info
+            )
+        else:
+            # Default prompt
+            prompt = f"""You are an expert cover letter writer. Write a professional, enthusiastic cover letter for the following job application.
 
 **Job Details:**
 - Company: {company}
@@ -225,16 +293,24 @@ Write only the cover letter body text, nothing else."""
 class CoverLetterManager:
     """Manage cover letter generation and storage"""
     
-    def __init__(self, generator: CoverLetterGenerator, output_dir: Path, signature: Optional[str] = None):
+    def __init__(
+        self,
+        generator: CoverLetterGenerator,
+        output_dir: Path,
+        template_path: Optional[Path] = None,
+        signature: Optional[str] = None
+    ):
         """Initialize manager
         
         Args:
             generator: CoverLetterGenerator instance
             output_dir: Directory to save cover letters
+            template_path: Path to DOCX template file
             signature: Signature line for cover letters (optional)
         """
         self.generator = generator
         self.output_dir = output_dir
+        self.template_path = template_path
         self.signature = signature
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -295,7 +371,7 @@ class CoverLetterManager:
         # Save as PDF
         from .pdf_builder import PDFBuilder
         
-        builder = PDFBuilder(self.output_dir)
+        builder = PDFBuilder(self.output_dir, template_path=self.template_path)
         success = builder.create_cover_letter(company, job_title, cover_text, signature=self.signature)
         
         if success:

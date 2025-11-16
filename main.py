@@ -142,24 +142,32 @@ def generate(folder, job_board, force, dry_run):
             resume_text = config.get("profile.resume_text", "")
             additional_info = config.get("profile.additional_info", "")
             signature = config.get_signature()
+            user_profile = config.get_user_profile()
+            template_path = config.get_template_path()
+            prompt_template = config.get("cover_letter.prompt")
             
             if not resume_text:
                 print("⚠️  Warning: Resume text is empty. Cover letters may be generic.")
             
             print(f"Provider: {provider}")
             print(f"Model: {model}")
+            if template_path:
+                print(f"Template: {template_path.name}")
             
             generator = CoverLetterGenerator(
                 provider=provider,
                 model=model,
                 api_key=api_key,
                 resume_text=resume_text,
-                additional_info=additional_info
+                user_profile=user_profile,
+                additional_info=additional_info,
+                prompt_template=prompt_template
             )
             
             manager = CoverLetterManager(
                 generator=generator,
                 output_dir=config.get_cover_letters_dir(),
+                template_path=template_path,
                 signature=signature
             )
             
@@ -301,6 +309,14 @@ def config(show, set):
                 
                 print(f"Defaults:")
                 print(f"  Folder: {config_mgr.get('defaults.folder_name')}")
+                print()
+                
+                print(f"Cover Letter:")
+                prompt = config_mgr.get('cover_letter.prompt', '')
+                if prompt:
+                    print(f"  Custom prompt: {len(prompt)} chars")
+                else:
+                    print(f"  Using default prompt")
                 print()
                 
             except FileNotFoundError:
