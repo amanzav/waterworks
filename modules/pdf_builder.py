@@ -1,11 +1,13 @@
 """PDF generation module for cover letters"""
 
 import re
+import os
+import subprocess
+import platform
 from pathlib import Path
 from typing import Optional
 from docx import Document
 from docx.shared import Pt
-import pythoncom
 from .utils import sanitize_filename
 
 
@@ -92,7 +94,7 @@ class PDFBuilder:
             return False
     
     def _convert_to_pdf(self, docx_path: Path) -> bool:
-        """Convert DOCX to PDF
+        """Convert DOCX to PDF using platform-appropriate method
         
         Args:
             docx_path: Path to DOCX file
@@ -100,38 +102,177 @@ class PDFBuilder:
         Returns:
             True if successful
         """
-        import platform
+        system = platform.system()
         
-        # Check if running on Windows
-        if platform.system() != "Windows":
-            print(f"      ⚠️  PDF conversion only supported on Windows")
-            print(f"      ℹ️  DOCX file saved at: {docx_path}")
-            print(f"      💡 Tip: Use LibreOffice to convert manually:")
-            print(f"          libreoffice --headless --convert-to pdf '{docx_path}'")
-            return True  # DOCX was created successfully, manual conversion needed
+        # Try platform-specific conversion methods in order of preference
+        if system == "Windows":
+            return self._convert_windows(docx_path)
+        elif system in ["Linux", "Darwin"]:  # Darwin is macOS
+            # Try LibreOffice first, then pypandoc as fallback
+            if self._convert_libreoffice(docx_path):
+                return True
+            return self._convert_pypandoc(docx_path)
+        else:
+            print(f"      ⚠️  Unsupported platform: {system}")
+            return self._fallback_manual(docx_path)
+    
+    def _convert_windows(self, docx_path: Path) -> bool:
+        """Convert DOCX to PDF on Windows using docx2pdf
         
+        Args:
+            docx_path: Path to DOCX file
+            
+        Returns:
+            True if successful
+        """
         try:
+            import pythoncom
+            from docx2pdf import convert
+            
             # Initialize COM for Windows
             pythoncom.CoInitialize()
             
             try:
-                # Import here to avoid issues on non-Windows platforms
-                from docx2pdf import convert
-                
                 # Convert (docx2pdf automatically uses same name with .pdf extension)
                 convert(str(docx_path))
-                
                 return True
             finally:
                 # Always uninitialize COM
                 pythoncom.CoUninitialize()
             
         except ImportError as e:
-            print(f"      ⚠️  PDF conversion library not available: {e}")
-            print(f"      ℹ️  DOCX file saved at: {docx_path}")
-            print(f"      💡 Install with: pip install docx2pdf")
-            return False
+            print(f"      ⚠️  docx2pdf not available: {e}")
+            print(f"      💡 Install with: pip install docx2pdf pywin32")
+            return self._fallback_manual(docx_path)
         except Exception as e:
             print(f"      ⚠️  PDF conversion failed: {e}")
-            print(f"      ℹ️  DOCX file saved at: {docx_path}")
+            return self._fallback_manual(docx_path)
+    
+    def _convert_libreoffice(self, docx_path: Path) -> bool:
+        """Convert DOCX to PDF using LibreOffice command line
+        
+        Args:
+            docx_path: Path to DOCX file
+            
+        Returns:
+            True if successful
+        """
+        # Check if LibreOffice is available
+        libreoffice_commands = ['libreoffice', 'soffice']
+        
+        libreoffice_cmd = None
+        for cmd in libreoffice_commands:
+            try:
+                result = subprocess.run(
+                    [cmd, '--version'],
+                    capture_output=True,
+                    timeout=5
+                )
+                if result.returncode == 0:
+                    libreoffice_cmd = cmd
+                    break
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                continue
+        
+        if not libreoffice_cmd:
+            return False  # LibreOffice not found, will try fallback
+        
+        try:
+            # Convert using LibreOffice
+            # --headless: run without GUI
+            # --convert-to pdf: output format
+            # --outdir: output directory (same as input)
+            subprocess.run(
+                [
+                    libreoffice_cmd,
+                    '--headless',
+                    '--convert-to', 'pdf',
+                    '--outdir', str(docx_path.parent),
+                    str(docx_path)
+                ],
+                check=True,
+                capture_output=True,
+                timeout=30
+            )
+            
+            # Check if PDF was created
+            pdf_path = docx_path.with_suffix('.pdf')
+            if pdf_path.exists():
+                return True
+            else:
+                print(f"      ⚠️  LibreOffice conversion did not create PDF")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            print(f"      ⚠️  LibreOffice conversion timed out")
             return False
+        except subprocess.CalledProcessError as e:
+            print(f"      ⚠️  LibreOffice conversion failed: {e}")
+            return False
+        except Exception as e:
+            print(f"      ⚠️  Unexpected error with LibreOffice: {e}")
+            return False
+    
+    def _convert_pypandoc(self, docx_path: Path) -> bool:
+        """Convert DOCX to PDF using pypandoc (requires pandoc)
+        
+        Args:
+            docx_path: Path to DOCX file
+            
+        Returns:
+            True if successful
+        """
+        try:
+            import pypandoc
+            
+            pdf_path = docx_path.with_suffix('.pdf')
+            
+            # Convert using pypandoc
+            pypandoc.convert_file(
+                str(docx_path),
+                'pdf',
+                outputfile=str(pdf_path),
+                extra_args=['--pdf-engine=xelatex']
+            )
+            
+            if pdf_path.exists():
+                return True
+            else:
+                return False
+                
+        except ImportError:
+            # pypandoc not installed, fall back to manual
+            return False
+        except Exception as e:
+            print(f"      ⚠️  pypandoc conversion failed: {e}")
+            return False
+    
+    def _fallback_manual(self, docx_path: Path) -> bool:
+        """Fallback when automatic conversion fails - keep DOCX and inform user
+        
+        Args:
+            docx_path: Path to DOCX file
+            
+        Returns:
+            True (DOCX was created, manual conversion needed)
+        """
+        system = platform.system()
+        
+        print(f"      ℹ️  DOCX file saved at: {docx_path}")
+        print(f"      💡 Manual conversion needed:")
+        
+        if system == "Darwin":  # macOS
+            print(f"          # Install LibreOffice:")
+            print(f"          brew install libreoffice")
+            print(f"          # Or convert manually with:")
+            print(f"          open '{docx_path}' -a 'Microsoft Word'")
+        elif system == "Linux":
+            print(f"          # Install LibreOffice:")
+            print(f"          sudo apt-get install libreoffice  # Ubuntu/Debian")
+            print(f"          sudo dnf install libreoffice      # Fedora")
+            print(f"          # Or convert manually:")
+            print(f"          libreoffice --headless --convert-to pdf '{docx_path}'")
+        else:
+            print(f"          Open the file and save as PDF manually")
+        
+        return True  # DOCX was created successfully

@@ -10,6 +10,7 @@ Automate cover letter generation for Waterloo Works job applications using AI.
 - **🔐 Secure**: Duo 2FA authentication, credentials stored locally
 - **📄 PDF Output**: Professional PDF cover letters ready to upload
 - **🎯 Simple CLI**: Easy-to-use command-line interface
+- **🌍 Cross-Platform**: Works on Windows, macOS, and Linux
 
 ## 📋 Prerequisites
 
@@ -38,10 +39,53 @@ cd waterworks
 pip install -r requirements.txt
 ```
 
-**Note for Windows users**: If `docx2pdf` installation fails, you may need:
+**Platform-Specific Setup:**
+
+<details>
+<summary><b>Windows Users</b></summary>
+
+If `docx2pdf` installation fails, install pywin32:
 ```bash
 pip install pywin32
 ```
+
+</details>
+
+<details>
+<summary><b>macOS Users</b></summary>
+
+Install LibreOffice for PDF conversion:
+```bash
+brew install libreoffice
+```
+
+Alternative: The tool will create DOCX files that you can manually convert.
+
+</details>
+
+<details>
+<summary><b>Linux Users</b></summary>
+
+Install LibreOffice for PDF conversion:
+```bash
+# Ubuntu/Debian
+sudo apt-get install libreoffice
+
+# Fedora
+sudo dnf install libreoffice
+
+# Arch
+sudo pacman -S libreoffice-fresh
+```
+
+Alternative: Install pypandoc with pandoc:
+```bash
+# Ubuntu/Debian
+sudo apt-get install pandoc texlive-xetex
+pip install pypandoc
+```
+
+</details>
 
 ### 3. Run Setup Wizard
 
@@ -180,6 +224,17 @@ cover_letters/
 
 Naming format: `{Company}_{JobTitle}.pdf`
 
+### PDF Conversion Methods
+
+The tool automatically uses the best available method for your platform:
+
+- **Windows**: Uses `docx2pdf` with Microsoft Word COM automation
+- **macOS/Linux**: Uses LibreOffice command-line conversion (recommended)
+- **Fallback**: Uses `pypandoc` if LibreOffice is not available
+- **Manual**: Creates DOCX files if no conversion method is available
+
+You can always convert DOCX files to PDF manually if needed.
+
 ## 🔧 Troubleshooting
 
 ### "Configuration file not found"
@@ -191,21 +246,53 @@ Check that the `resume_pdf` path in your config points to a valid PDF file.
 ### "API key required"
 Set your API key in the config file or as an environment variable for your chosen provider.
 
-### PDF Conversion Fails (Windows)
+### PDF Conversion Issues
+
+<details>
+<summary><b>Windows</b></summary>
+
 Install Microsoft Word or ensure `pywin32` is installed:
 ```bash
-pip install pywin32
+pip install pywin32 docx2pdf
 ```
 
-### PDF Conversion Fails (Mac/Linux)
+If issues persist, the tool will create DOCX files that you can manually convert.
+
+</details>
+
+<details>
+<summary><b>macOS</b></summary>
+
 Install LibreOffice:
 ```bash
-# Mac
 brew install libreoffice
+```
 
+Or manually convert DOCX files:
+```bash
+libreoffice --headless --convert-to pdf /path/to/file.docx
+```
+
+</details>
+
+<details>
+<summary><b>Linux</b></summary>
+
+Install LibreOffice:
+```bash
 # Ubuntu/Debian
 sudo apt-get install libreoffice
+
+# Fedora
+sudo dnf install libreoffice
 ```
+
+Or use command-line conversion:
+```bash
+libreoffice --headless --convert-to pdf /path/to/file.docx
+```
+
+</details>
 
 ### Duo 2FA Timeout
 The script waits 60 seconds for Duo approval. If you timeout, just run the command again.
@@ -214,7 +301,7 @@ The script waits 60 seconds for Duo approval. If you timeout, just run the comma
 Make sure Google Chrome is installed. The script will automatically download the correct ChromeDriver.
 
 ### Empty Resume Text
-If PDF extraction fails during setup, manually add your resume text to `~/.geese/config.yaml` under `profile.resume_text`.
+If PDF extraction fails during setup, manually add your resume text to `~/.waterworks/config.yaml` under `profile.resume_text`.
 
 ## 🎯 Tips
 
