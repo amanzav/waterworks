@@ -65,7 +65,7 @@ This creates a config file at `~/.waterworks/config.yaml`
 ### 5. Generate Cover Letters
 
 ```bash
-python waterworks.py generate --folder waterworks
+python main.py generate --folder waterworks
 ```
 
 This will:
@@ -80,38 +80,38 @@ This will:
 
 ```bash
 # Generate for default folder (from config)
-python waterworks.py generate
+python main.py generate
 
 # Generate for specific folder
-python waterworks.py generate --folder my_jobs
+python main.py generate --folder my_jobs
 
 # Generate from Employer-Student Direct job board
-python waterworks.py generate --folder my_jobs --job-board direct
+python main.py generate --folder my_jobs --job-board direct
 
 # Force regenerate all (even if they exist)
-python waterworks.py generate --folder my_jobs --force
+python main.py generate --folder my_jobs --force
 
 # Preview what would be generated
-python waterworks.py generate --folder my_jobs --dry-run
+python main.py generate --folder my_jobs --dry-run
 ```
 
 ### Manage Configuration
 
 ```bash
 # Show current configuration
-python waterworks.py config --show
+python main.py config --show
 
 # Update a config value
-python waterworks.py config --set llm.model gpt-4o
-python waterworks.py config --set defaults.folder_name my_folder
+python main.py config --set llm.model gpt-4o
+python main.py config --set defaults.folder_name my_folder
 ```
 
 ### Get Help
 
 ```bash
-python waterworks.py --help
-python waterworks.py generate --help
-python waterworks.py config --help
+python main.py --help
+python main.py generate --help
+python main.py config --help
 ```
 
 ## ⚙️ Configuration
@@ -226,7 +226,7 @@ If PDF extraction fails during setup, manually add your resume text to `~/.geese
 
 ```
 waterworks/
-├── waterworks.py               # Main CLI entry point
+├── main.py                     # Main CLI entry point
 ├── setup.py                    # Interactive setup wizard
 ├── requirements.txt            # Python dependencies
 ├── config.yaml.template        # Configuration template

@@ -77,7 +77,7 @@ class PDFBuilder:
         company: str,
         job_title: str,
         cover_text: str,
-        signature: str = "Aman Zaveri"
+        signature: Optional[str] = None
     ) -> bool:
         """Create a cover letter PDF
         
@@ -85,7 +85,7 @@ class PDFBuilder:
             company: Company name
             job_title: Job title
             cover_text: Cover letter body text
-            signature: Signature line (default: "Aman Zaveri")
+            signature: Signature line (uses config or "Sincerely" if not provided)
             
         Returns:
             True if successful
@@ -132,23 +132,38 @@ class PDFBuilder:
         Returns:
             True if successful
         """
+        import platform
+        
+        # Check if running on Windows
+        if platform.system() != "Windows":
+            print(f"      ⚠️  PDF conversion only supported on Windows")
+            print(f"      ℹ️  DOCX file saved at: {docx_path}")
+            print(f"      💡 Tip: Use LibreOffice or similar to convert manually:")
+            print(f"          libreoffice --headless --convert-to pdf '{docx_path}'")
+            return False
+        
         try:
             # Initialize COM for Windows
             pythoncom.CoInitialize()
             
-            # Import here to avoid issues on non-Windows platforms
-            from docx2pdf import convert
+            try:
+                # Import here to avoid issues on non-Windows platforms
+                from docx2pdf import convert
+                
+                # Convert (docx2pdf automatically uses same name with .pdf extension)
+                convert(str(docx_path))
+                
+                return True
+            finally:
+                # Always uninitialize COM
+                pythoncom.CoUninitialize()
             
-            # Convert (docx2pdf automatically uses same name with .pdf extension)
-            convert(str(docx_path))
-            
-            # Uninitialize COM
-            pythoncom.CoUninitialize()
-            
-            return True
-            
+        except ImportError as e:
+            print(f"      ⚠️  PDF conversion library not available: {e}")
+            print(f"      ℹ️  DOCX file saved at: {docx_path}")
+            print(f"      💡 Install with: pip install docx2pdf")
+            return False
         except Exception as e:
             print(f"      ⚠️  PDF conversion failed: {e}")
             print(f"      ℹ️  DOCX file saved at: {docx_path}")
-            # Don't fail completely - keep the DOCX file
             return False

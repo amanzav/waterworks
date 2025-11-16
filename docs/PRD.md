@@ -67,7 +67,7 @@ Waterworks focuses exclusively on the cover letter generation workflow, keeping 
 
 3. **Generate Cover Letters**:
    ```bash
-   python waterworks.py generate --folder "waterworks_jobs"
+   python main.py generate --folder "waterworks_jobs"
    ```
    - Script logs into Waterloo Works (with Duo Mobile 2FA prompt)
    - Navigates to specified folder
@@ -143,7 +143,7 @@ waterworks/
 ├── PRD.md                          # This document
 ├── README.md                       # User-facing documentation
 ├── setup.py                        # Interactive setup wizard
-├── waterworks.py                   # Main CLI entry point
+├── main.py                         # Main CLI entry point
 ├── config.yaml.template            # Template config file
 ├── requirements.txt                # Python dependencies
 │
@@ -215,7 +215,7 @@ waterworks/
 - **So that** I can save hours of manual writing
 
 **Acceptance Criteria**:
-- Command: `python waterworks.py generate --folder "folder_name"`
+- Command: `python main.py generate --folder "folder_name"`
 - Logs into Waterloo Works with Duo 2FA
 - Navigates to specified folder
 - Extracts all jobs across all pages
@@ -275,7 +275,7 @@ waterworks/
 - Falls back to defaults if model unavailable
 
 **US-7: Dry Run Mode**
-- `python waterworks.py generate --folder "jobs" --dry-run`
+- `python main.py generate --folder "jobs" --dry-run`
 - Shows what would be generated without actually generating
 - Useful for checking job count before API costs
 
@@ -421,25 +421,25 @@ These may be considered for future versions.
 python setup.py
 
 # Generate cover letters (default folder from config)
-python waterworks.py generate
+python main.py generate
 
 # Generate from specific folder
-python waterworks.py generate --folder "urgent_jobs"
+python main.py generate --folder "urgent_jobs"
 
 # Generate from Employer-Student Direct job board
-python waterworks.py generate --folder "jobs" --job-board direct
+python main.py generate --folder "jobs" --job-board direct
 
 # Force regenerate all (ignore existing)
-python waterworks.py generate --force
+python main.py generate --force
 
 # Dry run (preview without generating)
-python waterworks.py generate --dry-run
+python main.py generate --dry-run
 
 # Update configuration
-python waterworks.py config --set llm.model="gpt-4o"
+python main.py config --set llm.model="gpt-4o"
 
 # Show current configuration
-python waterworks.py config --show
+python main.py config --show
 ```
 
 ### B. Example Output

@@ -100,9 +100,19 @@ class WaterlooWorksAuth:
             trust_button.click()
             
             # Wait for Waterloo Works to load
-            WebDriverWait(self.driver, TIMEOUT_MEDIUM).until(
-                EC.presence_of_element_located((By.XPATH, '//h1[text()="WaterlooWorks"]'))
-            )
+            try:
+                WebDriverWait(self.driver, TIMEOUT_MEDIUM).until(
+                    EC.presence_of_element_located((By.XPATH, '//h1[text()="WaterlooWorks"]'))
+                )
+            except Exception:
+                # Check if we're on an error page or still on login
+                current_url = self.driver.current_url
+                if "login" in current_url.lower() or "error" in current_url.lower():
+                    raise Exception(
+                        "Login failed. Please check your credentials and ensure 2FA was approved."
+                    )
+                # If we're somewhere else, assume it worked
+                pass
             
             print("✅ Login successful!\n")
             return self.driver

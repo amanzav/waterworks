@@ -230,3 +230,11 @@ class ConfigManager:
             Default job board type ('full' or 'direct')
         """
         return self.get("defaults.job_board", "full")
+    
+    def get_signature(self) -> Optional[str]:
+        """Get signature for cover letters
+        
+        Returns:
+            Signature string or None if not set
+        """
+        return self.get("profile.signature", None)

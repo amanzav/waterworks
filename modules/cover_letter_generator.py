@@ -214,15 +214,17 @@ Write only the cover letter body text, nothing else."""
 class CoverLetterManager:
     """Manage cover letter generation and storage"""
     
-    def __init__(self, generator: CoverLetterGenerator, output_dir: Path):
+    def __init__(self, generator: CoverLetterGenerator, output_dir: Path, signature: Optional[str] = None):
         """Initialize manager
         
         Args:
             generator: CoverLetterGenerator instance
             output_dir: Directory to save cover letters
+            signature: Signature line for cover letters (optional)
         """
         self.generator = generator
         self.output_dir = output_dir
+        self.signature = signature
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
     def cover_letter_exists(self, company: str, job_title: str) -> bool:
@@ -280,7 +282,7 @@ class CoverLetterManager:
         from .pdf_builder import PDFBuilder
         
         builder = PDFBuilder(self.output_dir)
-        success = builder.create_cover_letter(company, job_title, cover_text)
+        success = builder.create_cover_letter(company, job_title, cover_text, signature=self.signature)
         
         if success:
             print(f"      ✓ Saved cover letter")

@@ -35,7 +35,7 @@ def test_llm_connection():
         api_key = config.get_api_key(provider)
         if not api_key:
             print(f"❌ No API key configured for {provider}")
-            print(f"   Set it with: python waterworks.py config --set llm.api_keys.{provider} YOUR_KEY")
+            print(f"   Set it with: python main.py config --set llm.api_keys.{provider} YOUR_KEY")
             return False
         print(f"✅ API key found for {provider}")
     except ValueError as e:

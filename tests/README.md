@@ -161,7 +161,7 @@ python setup.py
 
 **Check:**
 ```bash
-python waterworks.py config --show
+python main.py config --show
 ```
 
 ### LLM Tests Fail
@@ -173,7 +173,7 @@ python waterworks.py config --show
 
 **Check:**
 ```bash
-python waterworks.py config --show
+python main.py config --show
 ```
 
 ### Navigation Tests Fail

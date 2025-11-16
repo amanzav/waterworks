@@ -136,10 +136,18 @@ def setup_profile() -> dict:
             else:
                 print(f"  ⚠️  File not found: {info_path}")
     
+    # Get signature
+    print("\n  What signature would you like to use for your cover letters?")
+    signature = prompt_with_default(
+        "Signature (e.g., your full name)",
+        ""
+    )
+    
     return {
         "resume_pdf": str(resume_path),
         "resume_text": resume_text,
-        "additional_info": additional_info
+        "additional_info": additional_info,
+        "signature": signature if signature else None
     }
 
 
@@ -348,9 +356,9 @@ def main():
     print(f"\nConfiguration saved to: {config_path}")
     print("\nNext steps:")
     print("  1. Save jobs to a folder in Waterloo Works")
-    print("  2. Run: python waterworks.py generate --folder <folder_name>")
+    print("  2. Run: python main.py generate --folder <folder_name>")
     print("  3. Review generated cover letters in:", paths["cover_letters_dir"])
-    print("\nFor help: python waterworks.py --help")
+    print("\nFor help: python main.py --help")
     print()
 
 

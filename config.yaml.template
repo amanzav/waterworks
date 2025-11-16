@@ -20,6 +20,9 @@ profile:
     - Projects you've worked on
     - Skills you want to highlight
     - Career goals
+  
+  # Signature line for cover letters (leave empty for default "Sincerely")
+  signature: "Your Name"
 
 # Waterloo Works Credentials
 # Leave password empty to be prompted securely at runtime

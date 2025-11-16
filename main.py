@@ -3,10 +3,10 @@
 Waterworks - CLI Cover Letter Generator for Waterloo Works
 
 Usage:
-    python waterworks.py generate --folder <folder_name>
-    python waterworks.py generate --folder <folder_name> --force
-    python waterworks.py generate --dry-run
-    python waterworks.py config --show
+    python main.py generate --folder <folder_name>
+    python main.py generate --folder <folder_name> --force
+    python main.py generate --dry-run
+    python main.py config --show
 """
 
 import sys
@@ -131,6 +131,7 @@ def generate(folder, job_board, force, dry_run):
             api_key = config.get_api_key()
             resume_text = config.get("profile.resume_text", "")
             additional_info = config.get("profile.additional_info", "")
+            signature = config.get_signature()
             
             if not resume_text:
                 print("⚠️  Warning: Resume text is empty. Cover letters may be generic.")
@@ -148,7 +149,8 @@ def generate(folder, job_board, force, dry_run):
             
             manager = CoverLetterManager(
                 generator=generator,
-                output_dir=config.get_cover_letters_dir()
+                output_dir=config.get_cover_letters_dir(),
+                signature=signature
             )
             
             # Extract job details and generate cover letters
@@ -218,8 +220,11 @@ def generate(folder, job_board, force, dry_run):
             print()
             
         finally:
-            # Close browser
-            auth.close()
+            # Close browser - ensure cleanup happens even if there are errors
+            try:
+                auth.close()
+            except Exception as e:
+                print(f"⚠️  Warning: Error during cleanup: {e}")
         
     except FileNotFoundError as e:
         print(f"\n❌ {e}")
@@ -311,8 +316,8 @@ def config(show, set):
             print("\n📋 Configuration Management")
             print("=" * 60)
             print("Usage:")
-            print("  python waterworks.py config --show              # Show current config")
-            print("  python waterworks.py config --set KEY VALUE     # Set a config value")
+            print("  python main.py config --show              # Show current config")
+            print("  python main.py config --set KEY VALUE     # Set a config value")
             print()
             print(f"Config file location: {config_mgr.config_path}")
             print()
