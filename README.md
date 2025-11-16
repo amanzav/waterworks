@@ -1,369 +1,143 @@
-# 💧 Waterworks - CLI Cover Letter Generator
+# 💧 Waterworks
 
 Automate cover letter generation for Waterloo Works job applications using AI.
 
-## ✨ Features
+**Requirements:** Python 3.9+ and Google Chrome
 
-- **🤖 AI-Powered**: Generate personalized cover letters using OpenAI, Anthropic, Gemini, or Groq
-- **📁 Folder-Based**: Process all jobs from a Waterloo Works folder
-- **⚡ Fast**: Skip already-generated cover letters, generate only what's needed
-- **🔐 Secure**: Duo 2FA authentication, credentials stored locally
-- **📄 PDF Output**: Professional PDF cover letters ready to upload
-- **🎯 Simple CLI**: Easy-to-use command-line interface
-- **🌍 Cross-Platform**: Works on Windows, macOS, and Linux
+## 🚀 Installation
 
-## 📋 Prerequisites
+**Easy Install (Recommended):**
 
-- Python 3.9+
-- University of Waterloo email and Waterloo Works access
-- Duo Mobile for 2FA
-- API key for your chosen LLM provider:
-  - [OpenAI API Key](https://platform.openai.com/api-keys) (recommended)
-  - [Anthropic API Key](https://console.anthropic.com/)
-  - [Google AI Studio](https://makersuite.google.com/app/apikey)
-  - [Groq API Key](https://console.groq.com/)
-- Google Chrome browser
+```bash
+# macOS/Linux
+curl -sSL https://raw.githubusercontent.com/amanzav/waterworks/main/install.sh | bash
 
-## 🚀 Quick Start
+# Windows PowerShell
+irm https://raw.githubusercontent.com/amanzav/waterworks/main/install.ps1 | iex
+```
 
-### 1. Clone the Repository
+This will download files, set up a virtual environment, install dependencies, and create a `waterworks` command.
+
+**Manual Install:**
 
 ```bash
 git clone https://github.com/amanzav/waterworks.git
 cd waterworks
-```
-
-### 2. Install Dependencies
-
-```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**Platform-Specific Setup:**
+## 📖 Getting Started
 
-<details>
-<summary><b>Windows Users</b></summary>
+### First Time Setup
 
-If `docx2pdf` installation fails, install pywin32:
+After installation, run the configuration wizard:
+
 ```bash
-pip install pywin32
+waterworks config
 ```
 
-</details>
+You'll be asked for:
+- **Resume PDF path** - Location of your resume file
+- **Waterloo Works credentials** - Your username/password
+- **LLM provider** - OpenAI, Anthropic, Gemini, or Groq
+- **API key** - [Get API keys here](https://platform.openai.com/api-keys) (OpenAI) or from your chosen provider
 
-<details>
-<summary><b>macOS Users</b></summary>
+Config is saved to `~/.waterworks/config.yaml`
 
-Install LibreOffice for PDF conversion:
+### Using Waterworks
+
+**Step 1:** Log into Waterloo Works and save jobs to a folder
+
+**Step 2:** Generate cover letters:
+
 ```bash
-brew install libreoffice
+waterworks generate --folder "My Jobs"
 ```
 
-Alternative: The tool will create DOCX files that you can manually convert.
+That's it! Cover letters will be in `./cover_letters/`
 
-</details>
-
-<details>
-<summary><b>Linux Users</b></summary>
-
-Install LibreOffice for PDF conversion:
-```bash
-# Ubuntu/Debian
-sudo apt-get install libreoffice
-
-# Fedora
-sudo dnf install libreoffice
-
-# Arch
-sudo pacman -S libreoffice-fresh
-```
-
-Alternative: Install pypandoc with pandoc:
-```bash
-# Ubuntu/Debian
-sudo apt-get install pandoc texlive-xetex
-pip install pypandoc
-```
-
-</details>
-
-### 3. Run Setup Wizard
+## 💻 Common Commands
 
 ```bash
-python setup.py
-```
+# Generate from specific folder
+waterworks generate --folder "My Jobs"
 
-The setup wizard will guide you through:
-- Providing your resume PDF
-- Setting Waterloo Works credentials
-- Choosing an LLM provider and model
-- Configuring output directories
+# Use Employer-Student Direct board instead of WaterlooWorks
+waterworks generate --folder "Jobs" --job-board direct
 
-This creates a config file at `~/.waterworks/config.yaml`
+# Regenerate all (skip existing check)
+waterworks generate --force
 
-### 4. Save Jobs on Waterloo Works
+# Preview without creating files
+waterworks generate --dry-run
 
-1. Log into [Waterloo Works](https://waterlooworks.uwaterloo.ca)
-2. Browse jobs and save desired positions to a folder (e.g., "waterworks")
-
-### 5. Generate Cover Letters
-
-```bash
-python main.py generate --folder waterworks
-```
-
-This will:
-- Log you into Waterloo Works (with Duo 2FA)
-- Extract all jobs from your folder
-- Generate personalized cover letters using AI
-- Save PDFs in `./cover_letters/`
-
-## 📖 Usage
-
-### Generate Cover Letters
-
-```bash
-# Generate for default folder (from config)
-python main.py generate
-
-# Generate for specific folder
-python main.py generate --folder my_jobs
-
-# Generate from Employer-Student Direct job board
-python main.py generate --folder my_jobs --job-board direct
-
-# Force regenerate all (even if they exist)
-python main.py generate --folder my_jobs --force
-
-# Preview what would be generated
-python main.py generate --folder my_jobs --dry-run
-```
-
-### Manage Configuration
-
-```bash
-# Show current configuration
-python main.py config --show
+# View your config
+waterworks config --show
 
 # Update a config value
-python main.py config --set llm.model gpt-4o
-python main.py config --set defaults.folder_name my_folder
+waterworks config --set llm.model gpt-4o
 ```
 
-### Get Help
+## 🔧 Platform Setup
 
+**Windows:** PDF conversion works automatically
+
+**macOS:** `brew install libreoffice`
+
+**Linux:** `sudo apt-get install libreoffice`
+
+## 🐛 Troubleshooting
+
+**"Configuration file not found"** → Run `waterworks config`
+
+**"API key required"** → Get key from your LLM provider, add to config or environment:
 ```bash
-python main.py --help
-python main.py generate --help
-python main.py config --help
-```
-
-## ⚙️ Configuration
-
-Your configuration is stored at `~/.waterworks/config.yaml`. You can edit it directly or use the `config` command.
-
-### Key Configuration Options
-
-```yaml
-profile:
-  resume_pdf: "/path/to/resume.pdf"
-  resume_text: "Your resume text (auto-extracted)"
-  additional_info: "Extra details not in resume"
-
-waterloo_works:
-  username: "your.email@uwaterloo.ca"
-  password: ""  # LEAVE EMPTY - will prompt securely at runtime
-
-llm:
-  provider: "openai"  # openai | anthropic | gemini | groq
-  model: "gpt-4o-mini"
-  api_key: ""  # Or set environment variable (RECOMMENDED)
-
-paths:
-  cover_letters_dir: "./cover_letters"
-
-defaults:
-  folder_name: "waterworks"
-  job_board: "full"  # full | direct
-```
-
-**⚠️ Security Warning**: Never commit your `config.yaml` to Git if it contains passwords or API keys. The `.gitignore` file is configured to exclude it, but always verify before committing.
-
-### LLM Provider Options
-
-| Provider | Recommended Model | Cost | Speed |
-|----------|------------------|------|-------|
-| OpenAI | `gpt-4o-mini` | 💰 Low | ⚡ Fast |
-| Anthropic | `claude-3-5-haiku-20241022` | 💰 Medium | ⚡ Fast |
-| Gemini | `gemini-1.5-flash` | 💰 Very Low/Free | ⚡ Very Fast |
-| Groq | `llama-3.1-8b-instant` | 💰 Free | ⚡⚡ Blazing Fast |
-
-### Environment Variables
-
-For better security, use environment variables for API keys:
-
-```bash
-# Add to your .bashrc, .zshrc, or .env file
 export OPENAI_API_KEY="sk-..."
-export ANTHROPIC_API_KEY="sk-ant-..."
-export GOOGLE_API_KEY="..."
-export GROQ_API_KEY="gsk_..."
 ```
 
-## 📂 Output
+**PDF conversion fails** → Install LibreOffice (see Platform Setup)
 
-Cover letters are saved as PDFs in your configured output directory (default: `./cover_letters/`):
+**Duo 2FA timeout** → You have 60 seconds to approve. Re-run if needed.
+
+## 🛠️ For Developers
+
+### Development Setup
+
+```bash
+git clone https://github.com/amanzav/waterworks.git
+cd waterworks
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Workflow
+
+1. Create branch: `git checkout -b feature/your-feature`
+2. Make changes in `modules/`
+3. Test: `python tests/run_all_tests.py`
+4. Commit and push
+5. Open PR
+
+### Project Structure
 
 ```
-cover_letters/
-├── Microsoft_Software_Engineer_Intern.pdf
-├── Google_SWE_Intern.pdf
-├── Amazon_Software_Development_Engineer_Intern.pdf
+modules/
+├── auth.py                     # Waterloo Works login
+├── cover_letter_generator.py  # LLM integration
+├── pdf_builder.py              # PDF generation
 └── ...
 ```
 
-Naming format: `{Company}_{JobTitle}.pdf`
+### Code Guidelines
 
-### PDF Conversion Methods
-
-The tool automatically uses the best available method for your platform:
-
-- **Windows**: Uses `docx2pdf` with Microsoft Word COM automation
-- **macOS/Linux**: Uses LibreOffice command-line conversion (recommended)
-- **Fallback**: Uses `pypandoc` if LibreOffice is not available
-- **Manual**: Creates DOCX files if no conversion method is available
-
-You can always convert DOCX files to PDF manually if needed.
-
-## 🔧 Troubleshooting
-
-### "Configuration file not found"
-Run `python setup.py` to create your configuration.
-
-### "Resume file not found"
-Check that the `resume_pdf` path in your config points to a valid PDF file.
-
-### "API key required"
-Set your API key in the config file or as an environment variable for your chosen provider.
-
-### PDF Conversion Issues
-
-<details>
-<summary><b>Windows</b></summary>
-
-Install Microsoft Word or ensure `pywin32` is installed:
-```bash
-pip install pywin32 docx2pdf
-```
-
-If issues persist, the tool will create DOCX files that you can manually convert.
-
-</details>
-
-<details>
-<summary><b>macOS</b></summary>
-
-Install LibreOffice:
-```bash
-brew install libreoffice
-```
-
-Or manually convert DOCX files:
-```bash
-libreoffice --headless --convert-to pdf /path/to/file.docx
-```
-
-</details>
-
-<details>
-<summary><b>Linux</b></summary>
-
-Install LibreOffice:
-```bash
-# Ubuntu/Debian
-sudo apt-get install libreoffice
-
-# Fedora
-sudo dnf install libreoffice
-```
-
-Or use command-line conversion:
-```bash
-libreoffice --headless --convert-to pdf /path/to/file.docx
-```
-
-</details>
-
-### Duo 2FA Timeout
-The script waits 60 seconds for Duo approval. If you timeout, just run the command again.
-
-### Chrome Driver Issues
-Make sure Google Chrome is installed. The script will automatically download the correct ChromeDriver.
-
-### Empty Resume Text
-If PDF extraction fails during setup, manually add your resume text to `~/.waterworks/config.yaml` under `profile.resume_text`.
-
-## 🎯 Tips
-
-1. **Test with Dry Run**: Use `--dry-run` to preview before generating
-2. **Start Small**: Test with a folder containing 2-3 jobs first
-3. **Review Output**: Always review generated cover letters before submitting
-4. **Customize Profile**: Add specific skills/interests in `additional_info`
-5. **Save API Costs**: Use `--force` sparingly - it regenerates everything
-
-## 📁 Project Structure
-
-```
-waterworks/
-├── main.py                     # Main CLI entry point
-├── setup.py                    # Interactive setup wizard
-├── requirements.txt            # Python dependencies
-├── config.yaml.template        # Configuration template
-├── README.md                   # This file
-│
-├── cover_letters/              # Generated cover letters (PDFs)
-│
-├── docs/
-│   └── PRD.md                  # Product requirements
-│
-├── modules/
-│   ├── __init__.py
-│   ├── auth.py                 # Waterloo Works authentication
-│   ├── config_manager.py       # Configuration handling
-│   ├── cover_letter_generator.py  # LLM-based generation
-│   ├── folder_navigator.py     # Folder navigation & job extraction
-│   ├── job_extractor.py        # Job detail scraping
-│   ├── pdf_builder.py          # PDF creation
-│   └── utils.py                # Selenium utilities
-│
-└── tests/
-    ├── __init__.py
-    ├── README.md               # Testing documentation
-    ├── run_all_tests.py        # Run complete test suite
-    ├── test_auth.py            # Authentication tests
-    ├── test_config.py          # Configuration tests
-    ├── test_llm.py             # LLM provider tests
-    ├── test_navigation.py      # Navigation & extraction tests
-    └── test_pdf.py             # PDF generation tests
-```
-
-## 🤝 Contributing
-
-This is a personal project, but suggestions and bug reports are welcome! Open an issue on GitHub.
-
-## 📄 License
-
-MIT License - feel free to use and modify for your own job search!
-
-## ⚠️ Disclaimer
-
-This tool is for personal use only. Always review generated cover letters before submitting. The author is not responsible for the content of generated cover letters or any consequences of using this tool.
-
-## 🙏 Acknowledgments
-
-- Built for University of Waterloo co-op students
-- Inspired by the tedious process of writing 50+ unique cover letters
+- Follow PEP 8
+- Add type hints and docstrings
+- Handle exceptions specifically
+- Test on multiple platforms
 
 ---
 
-**Good luck with your job search! 💧✨**
+**Questions?** Open an [issue](https://github.com/amanzav/waterworks/issues)
