@@ -69,6 +69,7 @@ $modules = @(
     "auth.py",
     "config_manager.py",
     "cover_letter_generator.py",
+    "cover_letter_uploader.py",
     "folder_navigator.py",
     "job_extractor.py",
     "pdf_builder.py",

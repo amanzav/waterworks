@@ -66,6 +66,7 @@ curl -sSL "$BASE_URL/modules/__init__.py" -o modules/__init__.py
 curl -sSL "$BASE_URL/modules/auth.py" -o modules/auth.py
 curl -sSL "$BASE_URL/modules/config_manager.py" -o modules/config_manager.py
 curl -sSL "$BASE_URL/modules/cover_letter_generator.py" -o modules/cover_letter_generator.py
+curl -sSL "$BASE_URL/modules/cover_letter_uploader.py" -o modules/cover_letter_uploader.py
 curl -sSL "$BASE_URL/modules/folder_navigator.py" -o modules/folder_navigator.py
 curl -sSL "$BASE_URL/modules/job_extractor.py" -o modules/job_extractor.py
 curl -sSL "$BASE_URL/modules/pdf_builder.py" -o modules/pdf_builder.py
