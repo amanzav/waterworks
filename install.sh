@@ -82,11 +82,11 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Upgrade pip
-pip install --upgrade pip --quiet
+pip install --upgrade pip
 
 # Install dependencies
 echo "📥 Installing dependencies..."
-pip install -r requirements.txt --quiet
+pip install -r requirements.txt
 
 echo "✅ Dependencies installed"
 echo ""

@@ -69,6 +69,7 @@ $modules = @(
     "auth.py",
     "config_manager.py",
     "cover_letter_generator.py",
+    "cover_letter_uploader.py",
     "folder_navigator.py",
     "job_extractor.py",
     "pdf_builder.py",
@@ -90,11 +91,11 @@ python -m venv venv
 & ".\venv\Scripts\Activate.ps1"
 
 # Upgrade pip
-python -m pip install --upgrade pip --quiet
+python -m pip install --upgrade pip
 
 # Install dependencies
 Write-Host "📥 Installing dependencies..." -ForegroundColor Yellow
-pip install -r requirements.txt --quiet
+pip install -r requirements.txt
 
 Write-Host "✅ Dependencies installed" -ForegroundColor Green
 Write-Host ""
