@@ -396,13 +396,18 @@ def upload(force, list_files, reset, stats):
     help="Show current configuration"
 )
 @click.option(
+    "--edit",
+    is_flag=True,
+    help="Open configuration file in default editor"
+)
+@click.option(
     "--set",
     nargs=2,
     type=str,
     metavar="KEY VALUE",
     help="Set a configuration value (e.g., --set llm.model gpt-4o)"
 )
-def config(show, set):
+def config(show, edit, set):
     """Manage Waterworks configuration"""
     
     try:
@@ -509,6 +514,33 @@ def config(show, set):
                 print("Run 'python setup.py' to create your configuration.")
                 sys.exit(1)
         
+        elif edit:
+            # Open configuration file in default editor
+            import subprocess
+            import platform
+            
+            if not config_mgr.config_path.exists():
+                print(f"\n❌ Configuration file not found at {config_mgr.config_path}")
+                print("Run 'python setup.py' to create your configuration.")
+                sys.exit(1)
+            
+            try:
+                system = platform.system()
+                if system == "Windows":
+                    # Windows: use start command
+                    subprocess.run(["cmd", "/c", "start", "", str(config_mgr.config_path)], check=True)
+                elif system == "Darwin":
+                    # macOS: use open command
+                    subprocess.run(["open", str(config_mgr.config_path)], check=True)
+                else:
+                    # Linux: try xdg-open
+                    subprocess.run(["xdg-open", str(config_mgr.config_path)], check=True)
+                
+                print(f"✅ Opened config file in default editor: {config_mgr.config_path}")
+            except Exception as e:
+                print(f"\n⚠️  Could not open file automatically: {e}")
+                print(f"Please manually open: {config_mgr.config_path}")
+        
         elif set:
             # Set a configuration value
             key, value = set
@@ -529,6 +561,7 @@ def config(show, set):
             print("=" * 60)
             print("Usage:")
             print("  python main.py config --show              # Show current config")
+            print("  python main.py config --edit              # Edit config file")
             print("  python main.py config --set KEY VALUE     # Set a config value")
             print()
             print(f"Config file location: {config_mgr.config_path}")
