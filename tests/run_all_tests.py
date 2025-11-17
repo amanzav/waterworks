@@ -45,6 +45,7 @@ def main():
     tests = [
         ("test_config.py", "Configuration Tests", True),
         ("test_pdf.py", "PDF Generation Tests", True),
+        ("test_uploader.py", "Cover Letter Uploader Tests", True),
         ("test_llm.py", "LLM Provider Tests", False),
         ("test_auth.py", "Authentication Tests", False),
         ("test_navigation.py", "Navigation & Extraction Tests", False),

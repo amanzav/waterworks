@@ -61,6 +61,14 @@ waterworks generate --folder "My Jobs"
 
 That's it! Cover letters will be in `./cover_letters/`
 
+**Step 3 (Optional):** Upload cover letters to Waterloo Works:
+
+```bash
+waterworks upload
+```
+
+Waterworks tracks which files have been uploaded, so you can run this command multiple times without duplicating uploads.
+
 ## 💻 Common Commands
 
 ```bash
@@ -75,6 +83,15 @@ waterworks generate --force
 
 # Preview without creating files
 waterworks generate --dry-run
+
+# Upload cover letters to Waterloo Works
+waterworks upload
+
+# Upload with options
+waterworks upload --force              # Re-upload all files
+waterworks upload --stats              # Show upload statistics
+waterworks upload --list               # List uploaded and pending files
+waterworks upload --reset              # Clear upload history
 
 # View your config
 waterworks config --show
@@ -97,6 +114,43 @@ Waterworks supports custom Word templates for your cover letters:
    ```
 
 The template will be used as the base formatting for all generated cover letters.
+
+### Uploading Cover Letters
+
+Waterworks can automatically upload your generated cover letters to Waterloo Works:
+
+**Basic Usage:**
+```bash
+waterworks upload
+```
+
+**Smart Tracking:** Waterworks keeps track of which files have been uploaded in `./data/uploaded_cover_letters.json`. This prevents duplicate uploads when you run the command multiple times.
+
+**Upload Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--force` | Re-upload all files, ignoring tracking |
+| `--stats` | Show upload statistics without uploading |
+| `--list` | List uploaded and pending files |
+| `--reset` | Clear upload tracking history |
+
+**Examples:**
+```bash
+# Upload only new cover letters
+waterworks upload
+
+# Check what's been uploaded without uploading
+waterworks upload --stats --list
+
+# Re-upload everything (useful after fixing files)
+waterworks upload --force
+
+# Reset tracking and start fresh
+waterworks upload --reset
+```
+
+**Note:** The upload feature requires an authenticated session to Waterloo Works and will prompt for your credentials if needed.
 
 ### Custom Cover Letter Prompts
 

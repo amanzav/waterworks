@@ -215,6 +215,20 @@ class ConfigManager:
         
         return path
     
+    def get_data_dir(self) -> Path:
+        """Get data directory path for storing application state
+        
+        Returns:
+            Path object for data directory
+        """
+        dir_path = self.get("paths.data_dir", "./data")
+        path = Path(dir_path).expanduser()
+        
+        # Create directory if it doesn't exist
+        path.mkdir(parents=True, exist_ok=True)
+        
+        return path
+    
     def get_default_folder(self) -> str:
         """Get default Waterloo Works folder name
         
