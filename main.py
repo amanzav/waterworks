@@ -6,6 +6,9 @@ Usage:
     python main.py generate --folder <folder_name>
     python main.py generate --folder <folder_name> --force
     python main.py generate --dry-run
+    python main.py upload
+    python main.py upload --stats --list
+    python main.py upload --force
     python main.py config --show
 """
 
@@ -20,6 +23,7 @@ from modules.auth import WaterlooWorksAuth
 from modules.folder_navigator import FolderNavigator
 from modules.job_extractor import JobExtractor
 from modules.cover_letter_generator import CoverLetterGenerator, CoverLetterManager
+from modules.cover_letter_uploader import CoverLetterUploader
 
 
 @click.group()
@@ -142,24 +146,32 @@ def generate(folder, job_board, force, dry_run):
             resume_text = config.get("profile.resume_text", "")
             additional_info = config.get("profile.additional_info", "")
             signature = config.get_signature()
+            user_profile = config.get_user_profile()
+            template_path = config.get_template_path()
+            prompt_template = config.get("cover_letter.prompt")
             
             if not resume_text:
                 print("⚠️  Warning: Resume text is empty. Cover letters may be generic.")
             
             print(f"Provider: {provider}")
             print(f"Model: {model}")
+            if template_path:
+                print(f"Template: {template_path.name}")
             
             generator = CoverLetterGenerator(
                 provider=provider,
                 model=model,
                 api_key=api_key,
                 resume_text=resume_text,
-                additional_info=additional_info
+                user_profile=user_profile,
+                additional_info=additional_info,
+                prompt_template=prompt_template
             )
             
             manager = CoverLetterManager(
                 generator=generator,
                 output_dir=config.get_cover_letters_dir(),
+                template_path=template_path,
                 signature=signature
             )
             
@@ -252,6 +264,133 @@ def generate(folder, job_board, force, dry_run):
 
 @cli.command()
 @click.option(
+    "--force",
+    is_flag=True,
+    help="Re-upload all files, ignoring tracking"
+)
+@click.option(
+    "--list",
+    "list_files",
+    is_flag=True,
+    help="List uploaded and pending files"
+)
+@click.option(
+    "--reset",
+    is_flag=True,
+    help="Reset upload tracking (clear history)"
+)
+@click.option(
+    "--stats",
+    is_flag=True,
+    help="Show upload statistics"
+)
+def upload(force, list_files, reset, stats):
+    """Upload cover letters to Waterloo Works"""
+    
+    try:
+        # Load configuration
+        print("📋 Loading configuration...")
+        config = ConfigManager()
+        config.load()
+        
+        # Validate configuration
+        is_valid, errors = config.validate()
+        if not is_valid:
+            print("\n❌ Configuration errors:")
+            for error in errors:
+                print(f"  • {error}")
+            print(f"\nEdit your config at: {config.config_path}")
+            sys.exit(1)
+        
+        print("✅ Configuration loaded\n")
+        
+        # Get credentials
+        username, password = config.get_credentials()
+        headless = config.get_headless()
+        
+        # Handle non-upload commands (don't require authentication)
+        cover_letters_dir = config.get_cover_letters_dir()
+        data_dir = config.get_data_dir()
+        
+        if reset:
+            # Reset upload tracking
+            uploader = CoverLetterUploader(
+                driver=None,  # Not needed for reset
+                cover_letters_dir=cover_letters_dir,
+                data_dir=data_dir
+            )
+            uploader.reset_upload_tracking()
+            return
+        
+        if stats or list_files:
+            # Show stats/list without authentication
+            uploader = CoverLetterUploader(
+                driver=None,  # Not needed for stats
+                cover_letters_dir=cover_letters_dir,
+                data_dir=data_dir
+            )
+            
+            if stats:
+                upload_stats = uploader.get_upload_stats()
+                print("\n📊 Upload Statistics")
+                print("=" * 60)
+                print(f"Total PDFs: {upload_stats['total_pdfs']}")
+                print(f"Uploaded: {upload_stats['uploaded_count']}")
+                print(f"Pending: {upload_stats['pending_count']}")
+                print()
+            
+            if list_files:
+                uploader.list_uploaded_files()
+                uploader.list_pending_files()
+            
+            return
+        
+        # Authenticate and login for upload
+        print("=" * 60)
+        print("🔐 Authentication")
+        print("=" * 60)
+        
+        auth = WaterlooWorksAuth(username, password, headless=headless)
+        driver = auth.login()
+        
+        try:
+            # Initialize uploader
+            print("\n" + "=" * 60)
+            print("📤 Cover Letter Upload")
+            print("=" * 60)
+            
+            uploader = CoverLetterUploader(
+                driver=driver,
+                cover_letters_dir=cover_letters_dir,
+                data_dir=data_dir
+            )
+            
+            # Upload all cover letters
+            uploader.upload_all_cover_letters(force=force)
+            
+        finally:
+            # Close browser - ensure cleanup happens even if there are errors
+            if 'auth' in locals():
+                try:
+                    auth.close()
+                except Exception as e:
+                    print(f"⚠️  Warning: Error during cleanup: {e}")
+        
+    except FileNotFoundError as e:
+        print(f"\n❌ {e}")
+        sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Interrupted by user. Cleaning up...")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
+@cli.command()
+@click.option(
     "--show",
     is_flag=True,
     help="Show current configuration"
@@ -301,6 +440,14 @@ def config(show, set):
                 
                 print(f"Defaults:")
                 print(f"  Folder: {config_mgr.get('defaults.folder_name')}")
+                print()
+                
+                print(f"Cover Letter:")
+                prompt = config_mgr.get('cover_letter.prompt', '')
+                if prompt:
+                    print(f"  Custom prompt: {len(prompt)} chars")
+                else:
+                    print(f"  Using default prompt")
                 print()
                 
             except FileNotFoundError:

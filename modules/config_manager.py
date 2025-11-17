@@ -215,6 +215,20 @@ class ConfigManager:
         
         return path
     
+    def get_data_dir(self) -> Path:
+        """Get data directory path for storing application state
+        
+        Returns:
+            Path object for data directory
+        """
+        dir_path = self.get("paths.data_dir", "./data")
+        path = Path(dir_path).expanduser()
+        
+        # Create directory if it doesn't exist
+        path.mkdir(parents=True, exist_ok=True)
+        
+        return path
+    
     def get_default_folder(self) -> str:
         """Get default Waterloo Works folder name
         
@@ -246,3 +260,37 @@ class ConfigManager:
             True if headless mode enabled, False otherwise
         """
         return self.get("browser.headless", False)
+    
+    def get_user_profile(self) -> Dict[str, str]:
+        """Get user profile information for cover letter headers
+        
+        Returns:
+            Dictionary containing user profile data
+        """
+        return {
+            "name": self.get("profile.name", ""),
+            "email": self.get("profile.email", ""),
+            "phone": self.get("profile.phone", ""),
+            "linkedin": self.get("profile.linkedin", ""),
+            "github": self.get("profile.github", ""),
+            "website": self.get("profile.website", ""),
+        }
+    
+    def get_template_path(self) -> Optional[Path]:
+        """Get path to user's cover letter template
+        
+        Returns:
+            Path to template DOCX file, or None if not set
+        """
+        template = self.get("profile.cover_letter_template")
+        if template:
+            path = Path(template).expanduser()
+            if path.exists():
+                return path
+        
+        # Fall back to default template if it exists
+        default_template = Path(__file__).parent.parent / "templates" / "template.docx"
+        if default_template.exists():
+            return default_template
+        
+        return None
