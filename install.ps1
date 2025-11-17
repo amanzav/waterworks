@@ -90,11 +90,11 @@ python -m venv venv
 & ".\venv\Scripts\Activate.ps1"
 
 # Upgrade pip
-python -m pip install --upgrade pip --quiet
+python -m pip install --upgrade pip
 
 # Install dependencies
 Write-Host "📥 Installing dependencies..." -ForegroundColor Yellow
-pip install -r requirements.txt --quiet
+pip install -r requirements.txt
 
 Write-Host "✅ Dependencies installed" -ForegroundColor Green
 Write-Host ""

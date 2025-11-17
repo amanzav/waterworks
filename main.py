@@ -417,37 +417,91 @@ def config(show, set):
                 print(f"Config file: {config_mgr.config_path}")
                 print()
                 
-                # Show key settings
+                # Profile section
                 print(f"Profile:")
-                print(f"  Resume: {config_mgr.get('profile.resume_pdf')}")
-                print(f"  Resume text length: {len(config_mgr.get('profile.resume_text', ''))} chars")
+                print(f"  Name: {config_mgr.get('profile.name', '(not set)')}")
+                print(f"  Email: {config_mgr.get('profile.email', '(not set)')}")
+                print(f"  Phone: {config_mgr.get('profile.phone', '(not set)')}")
+                print(f"  LinkedIn: {config_mgr.get('profile.linkedin', '(not set)')}")
+                print(f"  GitHub: {config_mgr.get('profile.github', '(not set)')}")
+                print(f"  Website: {config_mgr.get('profile.website', '(not set)')}")
+                print(f"  Resume PDF: {config_mgr.get('profile.resume_pdf', '(not set)')}")
+                resume_text = config_mgr.get('profile.resume_text', '')
+                if resume_text:
+                    print(f"  Resume text: {len(resume_text)} chars")
+                else:
+                    print(f"  Resume text: (not set)")
+                additional_info = config_mgr.get('profile.additional_info', '')
+                if additional_info:
+                    print(f"  Additional info: {len(additional_info)} chars")
+                else:
+                    print(f"  Additional info: (not set)")
+                signature = config_mgr.get('profile.signature', '')
+                if signature:
+                    print(f"  Signature: {len(signature)} chars")
+                else:
+                    print(f"  Signature: (not set)")
+                template = config_mgr.get('profile.cover_letter_template', '')
+                if template:
+                    print(f"  Cover letter template: {template}")
+                else:
+                    print(f"  Cover letter template: (using default)")
                 print()
                 
+                # Waterloo Works section
                 print(f"Waterloo Works:")
-                print(f"  Username: {config_mgr.get('waterloo_works.username')}")
-                print(f"  Password: {'***' if config_mgr.get('waterloo_works.password') else '(not set - will prompt)'}")
+                print(f"  Username: {config_mgr.get('waterloo_works.username', '(not set)')}")
+                password = config_mgr.get('waterloo_works.password', '')
+                if password:
+                    print(f"  Password: ***")
+                else:
+                    print(f"  Password: (not set - will prompt)")
                 print()
                 
+                # LLM section
                 print(f"LLM:")
-                print(f"  Provider: {config_mgr.get('llm.provider')}")
-                print(f"  Model: {config_mgr.get('llm.model')}")
-                print(f"  API Key: {'***' if config_mgr.get_api_key() else '(not set)'}")
+                print(f"  Provider: {config_mgr.get('llm.provider', '(not set)')}")
+                print(f"  Model: {config_mgr.get('llm.model', '(not set)')}")
+                api_key = config_mgr.get_api_key()
+                if api_key:
+                    print(f"  API Key: ***")
+                else:
+                    print(f"  API Key: (not set)")
+                
+                # Show API keys for all providers if configured
+                api_keys = config_mgr.get('llm.api_keys', {})
+                if api_keys:
+                    print(f"  API Keys:")
+                    for provider, key in api_keys.items():
+                        if key:
+                            print(f"    {provider}: ***")
                 print()
                 
+                # Paths section
                 print(f"Paths:")
-                print(f"  Cover letters: {config_mgr.get('paths.cover_letters_dir')}")
+                print(f"  Cover letters: {config_mgr.get('paths.cover_letters_dir', './cover_letters')}")
+                print(f"  Data: {config_mgr.get('paths.data_dir', './data')}")
                 print()
                 
+                # Defaults section
                 print(f"Defaults:")
-                print(f"  Folder: {config_mgr.get('defaults.folder_name')}")
+                print(f"  Folder name: {config_mgr.get('defaults.folder_name', 'waterworks')}")
+                print(f"  Job board: {config_mgr.get('defaults.job_board', 'full')}")
                 print()
                 
+                # Browser section
+                print(f"Browser:")
+                headless = config_mgr.get('browser.headless', False)
+                print(f"  Headless mode: {headless}")
+                print()
+                
+                # Cover Letter section
                 print(f"Cover Letter:")
                 prompt = config_mgr.get('cover_letter.prompt', '')
                 if prompt:
                     print(f"  Custom prompt: {len(prompt)} chars")
                 else:
-                    print(f"  Using default prompt")
+                    print(f"  Custom prompt: (using default)")
                 print()
                 
             except FileNotFoundError:
